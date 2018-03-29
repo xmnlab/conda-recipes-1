@@ -1,8 +1,8 @@
-{% set name = "mapd-ce-cpu" %}
+{% set name = "mapd-ce-render" %}
 {% set fname = "mapd-ce" %}
-{% set pkg_type = 'Linux-x86_64-cpu'%}
+{% set pkg_type = 'Linux-x86_64-render'%}
 {% set version = "3.6.0" %}
-{% set sha256 = "fc2707df3eff81f2faadcedecb0d2500df01ee6d90fbbe92836ebe4a8d099721" %}
+{% set sha256 = "f14a2f8be6eaaf689729c3e64879ca7a660ada376eb65bfbe4e7ce9d8c1e7cd5" %}
 
 package:
   name: {{ name|lower }}
@@ -30,7 +30,7 @@ about:
   license: other
   license_family: other
   license_file: EULA-CE.txt
-  summary: 'The MapD database CPU Community Edition'
+  summary: 'The MapD database GPU Community Edition'
 
   description: |
     Students, academics, and developers choose the single-node MapD Community edition 
