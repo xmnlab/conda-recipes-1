@@ -42,11 +42,6 @@ requirements:
     - libcxx
   run:
     - zlib
-#    - python
-#    - pip
-#    # if your project compiles code (such as a C extension) then add `toolchain` as a build requirement.
-#  run:
-#    - python
 
 #test:
   # Some package might need a `test/commands` key to check CLI.
