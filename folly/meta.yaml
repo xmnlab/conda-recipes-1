@@ -38,6 +38,7 @@ requirements:
     - toolchain
     - double-conversion
     - pkg-config
+    - openssl
 
 about:
   home: https://github.com/facebook/folly/
