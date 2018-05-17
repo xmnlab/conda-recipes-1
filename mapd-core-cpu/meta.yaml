@@ -29,11 +29,14 @@ requirements:
     - double-conversion
     - gdal
     - folly
-    - arrow
+    - arrow-cpp 0.7.1
     - thrift
     - thrift-cpp
     - blosc
     - toolchain
+    - libarchive
+    - maven
+    - bison
   run:
     - llvmdev
     - go
@@ -41,7 +44,7 @@ requirements:
     - openjdk
     - gperftools
     - gdal
-    - arrow
+    - arrow-cpp 0.7.1
 
 test:
   commands:
