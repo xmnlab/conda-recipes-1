@@ -1,0 +1,37 @@
+{% set version = "0.3.5" %}
+
+package:
+  name: glog
+  version: {{ version }}
+
+source:
+  fn: glog-{{ version }}.tar.gz
+  url: https://github.com/google/glog/archive/v{{ version }}.tar.gz
+  sha256: 7580e408a2c0b5a89ca214739978ce6ff480b5e7d8d7698a2aa92fadc484d1e0
+
+build:
+  number: 0
+  skip: true  # [win]
+
+requirements:
+  build:
+    - toolchain
+    - autoconf
+    - automake
+    - libtool
+
+test:
+  commands:
+    - test -f ${PREFIX}/lib/libglog.dylib            # [osx]
+    - test -f ${PREFIX}/lib/libglog.so               # [linux]
+
+about:
+  home: https://github.com/google/glog
+  license: BSD 3-Clause
+  license_file: COPYING
+  summary: C++ implementation of the Google logging module.
+
+extra:
+  recipe-maintainers:
+    - jakirkham
+    - xmnlab
