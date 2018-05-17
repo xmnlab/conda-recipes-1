@@ -1,6 +1,6 @@
 {% set name = "folly" %}
-{% set version = "2018.05.07.00" %}
-{% set sha256 = "d3d5b653070bd21e8b1f0bfc26a28bb0948fd6d81a5db67bed60659e9dabb547" %}
+{% set version = "2017.10.16.00" %}
+{% set sha256 = "725d98bae22c2930231773909ddd87063fe4b4dd822d65422c19bd028c2f6362" %}
 
 package:
   name: {{ name|lower }}
@@ -17,13 +17,11 @@ build:
 
 requirements:
   build:
-    - {{ compiler('cxx') }}
-    - {{ compiler('c') }} >=5
     - gtest
-    - boost
+    # - boost
     - cmake
     - automake
-    - boost-cpp
+    # - boost-cpp
     - libtool
     - lz4
     - backports.lzma
@@ -39,6 +37,12 @@ requirements:
     - double-conversion
     - pkg-config
     - openssl
+
+test:
+  requires:
+    - glog
+  commands:
+    - test -f ${PREFIX}/lib/libfolly.so                               # [linux]
 
 about:
   home: https://github.com/facebook/folly/
@@ -58,3 +62,4 @@ about:
 extra:
   recipe-maintainers:
     - xmnlab
+    - pearu

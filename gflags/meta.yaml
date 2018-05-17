@@ -1,0 +1,56 @@
+{% set version = "2.2.1" %}
+
+package:
+  name: gflags
+  version: {{ version }}
+
+source:
+  fn: gflags-{{ version }}.tar.gz
+  url: https://github.com/gflags/gflags/archive/v{{ version }}.tar.gz
+  sha1: b1c82261c8b9c87fb2fb5de6bdf70121ad1cca58
+
+
+build:
+  number: 0
+  # py36 since it uses vc14 like py35
+  skip: true  # [win and py36]
+  features:
+    - vc9   # [win and py27]
+    - vc10  # [win and py34]
+    - vc14  # [win and py35]
+
+
+requirements:
+  build:
+    - toolchain
+    - cmake
+    - python  # [win]
+    - msinttypes  # [win and py<35]
+
+test:
+  requires:
+    - python 2.7.*  # [win and py27]
+    - python 3.4.*  # [win and py34]
+    - python 3.5.*  # [win and py35]
+  commands:
+    - test -f ${PREFIX}/lib/libgflags.dylib                           # [osx]
+    - test -f ${PREFIX}/lib/libgflags_nothreads.dylib                 # [osx]
+    - test -f ${PREFIX}/lib/libgflags.so                              # [linux]
+    - test -f ${PREFIX}/lib/libgflags_nothreads.so                    # [linux]
+    - test -f ${PREFIX}/lib/libgflags.a                               # [not win]
+    - test -f ${PREFIX}/lib/libgflags_nothreads.a                     # [not win]
+    - if not exist %PREFIX%\\Library\\bin\\gflags.dll exit 1          # [win]
+    - if not exist %PREFIX%\\Library\\lib\\gflags.lib exit 1          # [win]
+    - if not exist %PREFIX%\\Library\\lib\\gflags_static.lib exit 1   # [win]
+
+about:
+  home: https://github.com/gflags/gflags
+  license: BSD 3-Clause
+  license_file: COPYING.txt
+  summary: A C++ library that implements commandline flags processing.
+
+extra:
+  recipe-maintainers:
+    - jakirkham
+    - wesm
+    - xhochy
