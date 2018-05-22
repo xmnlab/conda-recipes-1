@@ -1,0 +1,108 @@
+{% set version = "1.67.0" %}
+{% set filename = "boost_%s.tar.bz2" % version.replace(".", "_") %}
+
+package:
+  name: boost-cpp
+  version: {{ version }}
+
+source:
+  url: https://dl.bintray.com/boostorg/release/{{ version }}/source/{{ filename }}
+  sha256: 2684c972994ee57fc5632e03bf044746f6eb45d4920c343937a465fd67a5adba
+
+build:
+  number: 1
+  skip: true            # [win and py36]
+  features:
+    - vc9               # [win and py27]
+    - vc14              # [win and (py35 or py36)]
+
+requirements:
+  build:
+    - {{ compiler('cxx') }} 5.*
+    - python            # [win]
+    - icu 58.*          # [unix]
+    - bzip2 1.0.*       # [unix]
+    - xz 5.2.*          # [unix]
+    - zlib 1.2.11
+    - vc 9              # [win and py27]
+    - vc 14             # [win and py35]
+
+  run:
+    - icu 58.*          # [unix]
+    - bzip2 1.0.*       # [unix]
+    - xz 5.2.*          # [unix]
+    - zlib 1.2.11
+    - vc 9              # [win and py27]
+    - vc 14             # [win and py35]
+
+test:
+  commands:
+    # Verify Python headers are removed.
+    - "! test -f $PREFIX/include/boost/python.hpp"                      # [unix]
+    - "! test -d $PREFIX/include/boost/python"                          # [unix]
+    - if exist %PREFIX%\\Library\\include\\boost\\python.hpp exit 1     # [win]
+    - if exist %PREFIX%\\Library\\include\\boost\\python exit 1         # [win]
+
+    # Verify static-only libraries.
+    - test -f $PREFIX/lib/libboost_exception.a                   # [unix]
+    - test -f $PREFIX/lib/libboost_test_exec_monitor.a           # [unix]
+
+    # Verify libraries.
+    {% set boost_libs = [
+            "atomic",
+            "chrono",
+            "container",
+            "context",
+            "coroutine",
+            "date_time",
+            "filesystem",
+            "graph",
+            "iostreams",
+            "locale",
+            "log",
+            "log_setup",
+            "math_c99",
+            "math_c99f",
+            "math_c99l",
+            "math_tr1",
+            "math_tr1f",
+            "math_tr1l",
+            "prg_exec_monitor",
+            "program_options",
+            "random",
+            "regex",
+            "serialization",
+            "signals",
+            "system",
+            "thread",
+            "timer",
+            "type_erasure",
+            "unit_test_framework",
+            "wave",
+            "wserialization"
+    ] %}
+    {% for each_boost_lib in boost_libs %}
+    - test -f $PREFIX/lib/libboost_{{ each_boost_lib }}.a                                                 # [unix]
+    - test -f $PREFIX/lib/libboost_{{ each_boost_lib }}.dylib                                             # [osx]
+    - test -f $PREFIX/lib/libboost_{{ each_boost_lib }}.so                                                # [linux]
+    - if not exist %PREFIX%\\Library\\bin\\boost_{{ each_boost_lib }}.dll exit 1                          # [win]
+    - if not exist %PREFIX%\\Library\\lib\\boost_{{ each_boost_lib }}.lib exit 1                          # [win]
+    - if not exist %PREFIX%\\Library\\lib\\libboost_{{ each_boost_lib }}.lib exit 1                       # [win]
+    {% endfor %}
+    - conda inspect linkages -p $PREFIX $PKG_NAME  # [not win]
+    - conda inspect objects -p $PREFIX $PKG_NAME  # [osx]
+
+about:
+  home: http://www.boost.org/
+  license: Boost-1.0
+  license_file: LICENSE_1_0.txt
+  summary: Free peer-reviewed portable C++ source libraries.
+
+extra:
+  recipe-maintainers:
+    - ccordoba12
+    - jakirkham
+    - msarahan
+    - ocefpaf
+    - jschueller
+    - isuruf

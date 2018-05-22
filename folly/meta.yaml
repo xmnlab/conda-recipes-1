@@ -12,16 +12,17 @@ source:
   sha256: {{ sha256 }}
 
 build:
-  number: 0
+  number: 2
   skip: true  # [not linux]
 
 requirements:
   build:
+    - {{ compiler('cxx') }}
     - gtest
-    # - boost
+    - boost-cpp
+    - boost
     - cmake
     - automake
-    # - boost-cpp
     - libtool
     - lz4
     - backports.lzma
@@ -33,7 +34,6 @@ requirements:
     - openssl
     - libevent
     - libunwind
-    - toolchain
     - double-conversion
     - pkg-config
     - openssl
