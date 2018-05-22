@@ -19,7 +19,7 @@ CXXFLAGS="${CXXFLAGS} -fPIC -std=c++14"
 if [ "$(uname)" == "Darwin" ]; then
     TOOLSET=clang
 elif [ "$(uname)" == "Linux" ]; then
-    TOOLSET=gcc
+    TOOLSET=$GCC
 fi
 
 LINKFLAGS="${LINKFLAGS} -L${LIBRARY_PATH}"
