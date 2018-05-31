@@ -26,6 +26,7 @@ COMMON_SYSTEM_PACKAGES="wget make git"
 case $TARGET in
 CentOS*)
   SYSTEM_INSTALL_COMMAND="$SUDO yum install --assumeyes"
+  BOOST_PREFIX=$SYSTEM_PREFIX
   BOOST_PACKAGES="boost-context \
                   boost-thread \
                   boost-program-options \
@@ -41,6 +42,7 @@ CentOS*)
   ;;
 Ubuntu*)
   SYSTEM_INSTALL_COMMAND="$SUDO apt install --assume-yes"
+  BOOST_PREFIX=$SYSTEM_PREFIX
   BOOST_PACKAGES="libboost-context-dev \
                    libboost-thread-dev libboost-program-options-dev \
                    libboost-regex-dev \
@@ -58,7 +60,7 @@ Ubuntu*)
 
 esac
 
-echo "$SYSTEM_INSTALL_COMMAND $SYSTEM_PACKAGES" 
+#echo "$SYSTEM_INSTALL_COMMAND $SYSTEM_PACKAGES" 
 $SYSTEM_INSTALL_COMMAND $SYSTEM_PACKAGES 
 
 #
@@ -71,6 +73,7 @@ mkdir -p $LOCAL_PREFIX
 
 AWSCPP_VERSION=1.3.10
 GCC_VERSION=5.5.0
+THRIFT_VERSION=0.10.0
 
 source $RECIPE_DIR/packages.sh
 
@@ -78,8 +81,8 @@ case $TARGET in
 CentOS*)
   # CentOS gcc-4.8 is too old:
   install_gcc 
-  export CC=$GCC_PREFIX/bin/gcc
-  export CXX=$GCC_PREFIX/bin/g++
+  export CC=$LOCAL_PREFIX/bin/gcc
+  export CXX=$LOCAL_PREFIX/bin/g++
   $SUDO yum remove -y gcc-c++ gcc # to make sure that gcc-5 is used
 
   # CentOS cmake-2.8 is too old:
@@ -92,4 +95,5 @@ Ubuntu*)
 *)
 esac
 
-#install_awscpp
+#install_awscpp # works on ubuntu
+install_thrift # works on ubuntu

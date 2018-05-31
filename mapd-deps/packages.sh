@@ -118,3 +118,23 @@ function install_awscpp() {
 
     popd
 }
+
+function install_thrift() {
+  download http://apache.claz.org/thrift/$THRIFT_VERSION/thrift-$THRIFT_VERSION.tar.gz
+  extract thrift-$THRIFT_VERSION.tar.gz
+  pushd thrift-$THRIFT_VERSION
+  patch -p1 < $RECIPE_DIR/thrift-3821-tmemorybuffer-overflow-check.patch
+  patch -p1 < $RECIPE_DIR/thrift-3821-tmemorybuffer-overflow-test.patch
+  CFLAGS="-fPIC" CXXFLAGS="-fPIC" JAVA_PREFIX=$PREFIX/lib ./configure \
+    --prefix=$PREFIX \
+    --with-lua=no \
+    --with-python=no \
+    --with-php=no \
+    --with-ruby=no \
+    --with-qt4=no \
+    --with-qt5=no \
+    #--with-boost-libdir=$BOOST_PREFIX/lib
+  makej
+  make install
+  popd
+}
