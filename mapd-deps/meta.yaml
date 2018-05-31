@@ -1,0 +1,24 @@
+{% set name = "mapd-deps" %}
+{% set version = "0.1" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+build:
+  skip: True # [not linux]
+
+requirements:
+  build:
+
+about:
+  summary: 'The MapD Core dependencies'
+
+  description: |
+    Build MapD Core dependencies using system libraries as well as
+    from sources. Supported systems: Ubuntu, CentOS.
+
+extra:
+  recipe-maintainers:
+    - pearu
+
