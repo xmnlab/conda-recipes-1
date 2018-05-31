@@ -30,29 +30,30 @@ fi
 TARGET=`lsb_release -i -s`-`lsb_release -c -s`
 echo "TARGET=$TARGET" # Ubuntu-xenial, CentOS-Core
 
-COMMON_SYSTEM_PACKAGES="wget make git"
+COMMON_SYSTEM_PACKAGES="wget make git autoconf autoconf-archive automake libtool"
 
 case $TARGET in
 CentOS*)
   SYSTEM_INSTALL_COMMAND="$SUDO yum install --assumeyes"
   BOOST_PREFIX=$SYSTEM_PREFIX
+  BOOST_LIBDIR=$BOOST_PREFIX/lib64
   BOOST_PACKAGES="boost-context \
                   boost-thread \
                   boost-program-options \
                   boost-regex \
                   boost-system \
                   boost-chrono \
-                  boost-filesystem"
+                  boost-filesystem \
+                  boost-devel"
   SYSTEM_PACKAGES="$COMMON_SYSTEM_PACKAGES $BOOST_PACKAGES \
                    zlib-devel \
                    gmp-devel mpfr-devel libmpc-devel \
-                   openssl-devel \
-                   libcurl-devel \
                    "
   ;;
 Ubuntu*)
   SYSTEM_INSTALL_COMMAND="$SUDO apt install --assume-yes"
   BOOST_PREFIX=$SYSTEM_PREFIX
+  BOOST_LIBDIR=$BOOST_PREFIX/lib64
   BOOST_PACKAGES="libboost-context-dev \
                    libboost-thread-dev libboost-program-options-dev \
                    libboost-regex-dev \
@@ -63,6 +64,7 @@ Ubuntu*)
                    cmake \
                    gcc-5 g++-5 \
                    curl libcurl4-openssl-dev \
+                   libdouble-conversion-dev \
                    "
   ;;
 *)
@@ -81,23 +83,27 @@ $SYSTEM_INSTALL_COMMAND $SYSTEM_PACKAGES
 AWSCPP_VERSION=1.3.10
 GCC_VERSION=5.5.0
 THRIFT_VERSION=0.10.0
-
+GFLAGS_VERSION=2.2.0
+GLOG_VERSION=0.3.4
+LIBEVENT_VERSION=2.0.22
+FOLLY_VERSION=2017.10.16.00
+ARROW_VERSION=0.7.1
+CURL_VERSION=7.50.0
 source $RECIPE_DIR/packages.sh
 
 case $TARGET in
 CentOS*)
   # CentOS gcc-4.8 is too old:
-  $SYSTEM_INSTALL_COMMAND gcc-c++ gcc
   install_gcc $LOCAL_PREFIX $LOCAL_PREFIX/bin/gcc
-  $SUDO yum remove -y gcc-c++ gcc # to make sure that gcc-5 is used   
   export CC=$LOCAL_PREFIX/bin/gcc
   export CXX=$LOCAL_PREFIX/bin/g++
 
   # CentOS cmake-2.8 is too old:
   download_make_install_local https://internal-dependencies.mapd.com/thirdparty/cmake-3.7.2.tar.gz "" "" $LOCAL_PREFIX/bin/cmake
-  CMAKE=$LOCAL_PREFIX/bin/cmake
+  export CMAKE=$LOCAL_PREFIX/bin/cmake
 
-  #download_make_install_local https://www.openssl.org/source/openssl-1.0.2n.tar.gz "" "linux-$(uname -m) no-shared no-dso -fPIC"
+  download_make_install_local https://www.openssl.org/source/openssl-1.0.2n.tar.gz "" "linux-$(uname -m) no-shared no-dso -fPIC" $LOCAL_PREFIX/bin/openssl
+  download_make_install_local https://internal-dependencies.mapd.com/thirdparty/curl-$CURL_VERSION.tar.bz2 "" "--disable-ldap --disable-ldaps" $LOCAL_PREFIX/bin/curl
 
   ;;
 Ubuntu*)
@@ -108,5 +114,7 @@ Ubuntu*)
 *)
 esac
 
-install_awscpp $LOCAL_PREFIX $LOCAL_PREFIX/lib/libaws-cpp-sdk-core.a # works on ubuntu, centos
-install_thrift $LOCAL_PREFIX $LOCAL_PREFIX/bin/thrift             # works on ubuntu, centos
+install_awscpp $LOCAL_PREFIX $LOCAL_PREFIX/include/aws/core/Aws.h
+install_thrift $LOCAL_PREFIX $LOCAL_PREFIX/bin/thrift
+install_folly $LOCAL_PREFIX $LOCAL_PREFIX/include/folly/folly-config.h
+install_arrow $LOCAL_PREFIX $LOCAL_PREFIX/include/TODO
