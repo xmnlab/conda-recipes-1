@@ -21,7 +21,7 @@ fi
 TARGET=`lsb_release -i -s`-`lsb_release -c -s`
 echo "TARGET=$TARGET" # Ubuntu-xenial, CentOS-Core
 
-COMMON_SYSTEM_PACKAGES="wget make git zlib"
+COMMON_SYSTEM_PACKAGES="wget make git"
 
 case $TARGET in
 CentOS*)
@@ -42,13 +42,12 @@ CentOS*)
 Ubuntu*)
   SYSTEM_INSTALL_COMMAND="$SUDO apt install --assume-yes"
   BOOST_PACKAGES="libboost-context-dev \
-                   libboost-thread-dev \
-                   libboost-program-options-dev \
+                   libboost-thread-dev libboost-program-options-dev \
                    libboost-regex-dev \
-                   libboost-system-dev \
-                   libboost-chrono-dev \
+                   libboost-system-dev libboost-chrono-dev \
                    libboost-filesystem-dev"
   SYSTEM_PACKAGES="$COMMON_SYSTEM_PACKAGES $BOOST_PACKAGES \
+                   zlib1g-dev \
                    cmake \
                    gcc-5 g++-5 \
                    "
@@ -59,6 +58,7 @@ Ubuntu*)
 
 esac
 
+echo "$SYSTEM_INSTALL_COMMAND $SYSTEM_PACKAGES" 
 $SYSTEM_INSTALL_COMMAND $SYSTEM_PACKAGES 
 
 #
@@ -71,10 +71,6 @@ mkdir -p $LOCAL_PREFIX
 
 AWSCPP_VERSION=1.3.10
 GCC_VERSION=5.5.0
-GCC_PREFIX=$PREFIX  # to be replaced with LOCAL_PREFIX
-
-GCC_PREFIX=$RECIP_DIR/installs  # temporary
-mkdir -p $GCC_PREFIX            # temporary
 
 source $RECIPE_DIR/packages.sh
 

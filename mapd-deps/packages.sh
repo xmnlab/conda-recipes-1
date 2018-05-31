@@ -52,9 +52,9 @@ function download_make_install_local() {
 
 
 function install_gcc_deps() {
-  download_make_install https://internal-dependencies.mapd.com/thirdparty/gmp-6.1.2.tar.xz "" "--enable-fat"
-  download_make_install https://internal-dependencies.mapd.com/thirdparty/mpfr-3.1.5.tar.xz "" "--with-gmp=$PREFIX"
-  download_make_install ftp://ftp.gnu.org/gnu/mpc/mpc-1.0.3.tar.gz "" "--with-gmp=$PREFIX"
+  download_make_install_local https://internal-dependencies.mapd.com/thirdparty/gmp-6.1.2.tar.xz "" "--enable-fat"
+  download_make_install_local https://internal-dependencies.mapd.com/thirdparty/mpfr-3.1.5.tar.xz "" "--with-gmp=$LOCAL_PREFIX"
+  download_make_install_local ftp://ftp.gnu.org/gnu/mpc/mpc-1.0.3.tar.gz "" "--with-gmp=$LOCAL_PREFIX"
 }
 
 function install_gcc() {
@@ -62,9 +62,9 @@ function install_gcc() {
   download ftp://ftp.gnu.org/gnu/gcc/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.xz
   extract gcc-$GCC_VERSION.tar.xz
   pushd gcc-$GCC_VERSION
-  export CPPFLAGS="-I$PREFIX/include"
+  export CPPFLAGS="-I$LOCAL_PREFIX/include"
   ./configure \
-    --prefix=$GCC_PREFIX \
+    --prefix=$LOCAL_PREFIX \
     --disable-multilib \
     --enable-bootstrap \
     --enable-shared \
