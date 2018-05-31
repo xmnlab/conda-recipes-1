@@ -6,13 +6,22 @@
 # PREFIX - installation prefix
 # RECIPE_DIR - path to recipe directory
 
+SYSTEM_PREFIX=/usr
+
+LOCAL_PREFIX=$PREFIX
+LOCAL_PREFIX=$RECIPE_DIR/local  # temporary, to cache succesful installations
+mkdir -p $LOCAL_PREFIX
+
+export PATH=$LOCAL_PREFIX/bin:$PREFIX/bin:$PATH
+export LD_LIBRARY_PATH=$SYSTEM_PREFIX/lib64:$SYSTEM_PREFIX/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$LOCAL_PREFIX/lib64:$LOCAL_PREFIX/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$PREFIX/lib64:$PREFIX/lib:$LD_LIBRARY_PATH
 
 #
 # Install system packages
 #
 
 # Installing system packages requires sudo
-SYSTEM_PREFIX=/usr
 SUDO=
 if [ ! -w $(dirname $SYSTEM_PREFIX) ] ; then
     SUDO=sudo
@@ -37,7 +46,8 @@ CentOS*)
   SYSTEM_PACKAGES="$COMMON_SYSTEM_PACKAGES $BOOST_PACKAGES \
                    zlib-devel \
                    gmp-devel mpfr-devel libmpc-devel \
-                   gcc-c++ gcc \
+                   openssl-devel \
+                   libcurl-devel \
                    "
   ;;
 Ubuntu*)
@@ -52,6 +62,7 @@ Ubuntu*)
                    zlib1g-dev \
                    cmake \
                    gcc-5 g++-5 \
+                   curl libcurl4-openssl-dev \
                    "
   ;;
 *)
@@ -67,9 +78,6 @@ $SYSTEM_INSTALL_COMMAND $SYSTEM_PACKAGES
 # Install packages from source
 #
 
-LOCAL_PREFIX=$PREFIX
-LOCAL_PREFIX=$RECIPE_DIR/local  # temporary
-mkdir -p $LOCAL_PREFIX
 
 AWSCPP_VERSION=1.3.10
 GCC_VERSION=5.5.0
@@ -80,20 +88,34 @@ source $RECIPE_DIR/packages.sh
 case $TARGET in
 CentOS*)
   # CentOS gcc-4.8 is too old:
-  install_gcc 
+  if [ -x $LOCAL_PREFIX/bin/gcc ]; then
+    echo "SKIP install_gcc: $LOCAL_PREFIX/bin/gcc exists."
+  else
+    $SYSTEM_INSTALL_COMMAND gcc-c++ gcc
+    install_gcc
+    $SUDO yum remove -y gcc-c++ gcc # to make sure that gcc-5 is used   
+  fi 
   export CC=$LOCAL_PREFIX/bin/gcc
   export CXX=$LOCAL_PREFIX/bin/g++
-  $SUDO yum remove -y gcc-c++ gcc # to make sure that gcc-5 is used
 
   # CentOS cmake-2.8 is too old:
-  #download_make_install https://internal-dependencies.mapd.com/thirdparty/cmake-3.7.2.tar.gz
+  if [ -x $LOCAL_PREFIX/bin/cmake ]; then
+    echo "SKIP building cmake: $LOCAL_PREFIX/bin/cmake exists."
+  else
+    download_make_install_local https://internal-dependencies.mapd.com/thirdparty/cmake-3.7.2.tar.gz
+  fi
+  CMAKE=$LOCAL_PREFIX/bin/cmake
+
+  #download_make_install_local https://www.openssl.org/source/openssl-1.0.2n.tar.gz "" "linux-$(uname -m) no-shared no-dso -fPIC"
+
   ;;
 Ubuntu*)
   export CC=gcc-5
   export CXX=g++-5
+  export CMAKE=cmake
   ;;
 *)
 esac
 
-#install_awscpp # works on ubuntu
-install_thrift # works on ubuntu
+#install_awscpp # works on ubuntu, centos
+#install_thrift # works on ubuntu, centos
