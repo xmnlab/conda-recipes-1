@@ -71,7 +71,6 @@ Ubuntu*)
 
 esac
 
-#echo "$SYSTEM_INSTALL_COMMAND $SYSTEM_PACKAGES" 
 $SYSTEM_INSTALL_COMMAND $SYSTEM_PACKAGES 
 
 #
@@ -88,22 +87,14 @@ source $RECIPE_DIR/packages.sh
 case $TARGET in
 CentOS*)
   # CentOS gcc-4.8 is too old:
-  if [ -x $LOCAL_PREFIX/bin/gcc ]; then
-    echo "SKIP install_gcc: $LOCAL_PREFIX/bin/gcc exists."
-  else
-    $SYSTEM_INSTALL_COMMAND gcc-c++ gcc
-    install_gcc
-    $SUDO yum remove -y gcc-c++ gcc # to make sure that gcc-5 is used   
-  fi 
+  $SYSTEM_INSTALL_COMMAND gcc-c++ gcc
+  install_gcc $LOCAL_PREFIX $LOCAL_PREFIX/bin/gcc
+  $SUDO yum remove -y gcc-c++ gcc # to make sure that gcc-5 is used   
   export CC=$LOCAL_PREFIX/bin/gcc
   export CXX=$LOCAL_PREFIX/bin/g++
 
   # CentOS cmake-2.8 is too old:
-  if [ -x $LOCAL_PREFIX/bin/cmake ]; then
-    echo "SKIP building cmake: $LOCAL_PREFIX/bin/cmake exists."
-  else
-    download_make_install_local https://internal-dependencies.mapd.com/thirdparty/cmake-3.7.2.tar.gz
-  fi
+  download_make_install_local https://internal-dependencies.mapd.com/thirdparty/cmake-3.7.2.tar.gz "" "" $LOCAL_PREFIX/bin/cmake
   CMAKE=$LOCAL_PREFIX/bin/cmake
 
   #download_make_install_local https://www.openssl.org/source/openssl-1.0.2n.tar.gz "" "linux-$(uname -m) no-shared no-dso -fPIC"
@@ -117,5 +108,5 @@ Ubuntu*)
 *)
 esac
 
-#install_awscpp # works on ubuntu, centos
-#install_thrift # works on ubuntu, centos
+install_awscpp $LOCAL_PREFIX $LOCAL_PREFIX/lib/libaws-cpp-sdk-core.a # works on ubuntu, centos
+install_thrift $LOCAL_PREFIX $LOCAL_PREFIX/bin/thrift             # works on ubuntu, centos
