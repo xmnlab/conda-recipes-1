@@ -357,7 +357,8 @@ function install_llvm() {
     $CMAKE -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX=$1 \
       -DLLVM_ENABLE_RTTI=on \
-      -DPYTHON_EXECUTABLE=`which python` \
+      -DPYTHON_INCLUDE_DIR=$(python -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")  \
+      -DPYTHON_LIBRARY=$(python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))") \
        ../llvm-$VERS.src
     makej
     #if [ ! -d "lib/python2.7" ]; then

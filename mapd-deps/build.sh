@@ -53,7 +53,7 @@ CentOS*)
                    unzip ncurses-devel \
                    libarchive-devel xz-devel bzip2-devel \
                    golang maven flex \
-                   swig"
+                   swig libedit-devel"
   ;;
 Ubuntu*)
   SYSTEM_INSTALL_COMMAND="$SUDO apt install --assume-yes"
