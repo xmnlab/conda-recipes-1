@@ -58,7 +58,7 @@ CentOS*)
 Ubuntu*)
   SYSTEM_INSTALL_COMMAND="$SUDO apt install --assume-yes"
   BOOST_PREFIX=$SYSTEM_PREFIX
-  BOOST_LIBDIR=$BOOST_PREFIX/lib64
+  BOOST_LIBDIR=$BOOST_PREFIX/lib/x86_64-linux-gnu
   BOOST_PACKAGES="libboost-context-dev \
                    libboost-thread-dev libboost-program-options-dev \
                    libboost-regex-dev \
