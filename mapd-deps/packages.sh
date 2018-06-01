@@ -121,7 +121,7 @@ function install_awscpp() {
         -DCUSTOM_MEMORY_MANAGEMENT=0 \
         -DCPP_STANDARD=$CPP_STANDARD \
         ..
-    make
+    makej
 
     # sudo is needed on osx
     os=`uname`
@@ -135,11 +135,24 @@ function install_awscpp() {
   fi
 }
 
+function install_boost() {
+  if [ -f "$2" ]; then
+    echo "SKIP install_boost: $2 exists"
+  else
+    BOOST_VERSION=1_62_0
+    download https://internal-dependencies.mapd.com/thirdparty/boost_$BOOST_VERSION.tar.bz2
+    extract boost_$BOOST_VERSION.tar.bz2
+    pushd boost_$BOOST_VERSION
+    ./bootstrap.sh --prefix=$1
+    ./b2 cxxflags=-fPIC install --prefix=$1 || true
+    popd
+  fi
+}
+
 function install_thrift() {
-  if [ -x "$2" ]; then
+  if [ -f "$2" ]; then
     echo "SKIP install_thrift: $2 exists"
   else
-    echo "$1 $2 MISSING"
     download http://apache.claz.org/thrift/$THRIFT_VERSION/thrift-$THRIFT_VERSION.tar.gz
     extract thrift-$THRIFT_VERSION.tar.gz
     pushd thrift-$THRIFT_VERSION
@@ -153,7 +166,8 @@ function install_thrift() {
       --with-ruby=no \
       --with-qt4=no \
       --with-qt5=no \
-      #--with-boost-libdir=$BOOST_PREFIX/lib
+      --with-boost=$BOOST_PREFIX \
+      --with-boost-libdir=$BOOST_LIBDIR
     makej
     make install
     popd
@@ -220,11 +234,53 @@ function install_folly() {
   fi
 }
 
+function install_rapidjson() {
+  if [ -f "$2" ]; then
+    echo "SKIP install_rapidjson: $2 exists"
+  else
+    download https://github.com/miloyip/rapidjson/archive/v$RAPIDJSON_VERSION.tar.gz
+    extract v$RAPIDJSON_VERSION.tar.gz
+    mkdir -p rapidjson-$RAPIDJSON_VERSION/build
+    pushd rapidjson-$RAPIDJSON_VERSION/build
+    $CMAKE \
+       -DCMAKE_CXX_FLAGS="-fPIC" \
+       -DCMAKE_INSTALL_PREFIX:PATH=$1 \
+       ..             
+    makej
+    make install
+    popd
+  fi
+}
+
+function install_flatbuffers() {
+  if [ -f "$2" ]; then
+    echo "SKIP install_flatbuffers: $2 exists"
+  else
+    download https://github.com/google/flatbuffers/archive/v$FLATBUFFERS_VERSION.tar.gz
+    extract v$FLATBUFFERS_VERSION.tar.gz
+    mkdir -p flatbuffers-$FLATBUFFERS_VERSION/build
+    pushd flatbuffers-$FLATBUFFERS_VERSION/build
+    $CMAKE \
+       -DCMAKE_CXX_FLAGS="-fPIC" \
+       -DCMAKE_INSTALL_PREFIX:PATH=$1 \
+       -DFLATBUFFERS_BUILD_TESTS=OFF \
+       ..
+    makej
+    make install
+    popd
+  fi
+}
 
 function install_arrow() {
   if [ -f "$2" ]; then
     echo "SKIP install_arrow: $2 exists"
   else
+    # workaround "libcurl w/o https support" issue:
+    install_rapidjson $1 $1/include/rapidjson/rapidjson.h
+    export RAPIDJSON_HOME=$1
+    install_flatbuffers $1 $1/bin/flatc
+    export FLATBUFFERS_HOME=$1
+
     download https://github.com/apache/arrow/archive/apache-arrow-$ARROW_VERSION.tar.gz
     extract apache-arrow-$ARROW_VERSION.tar.gz
     mkdir -p arrow-apache-arrow-$ARROW_VERSION/cpp/build
@@ -246,7 +302,88 @@ function install_arrow() {
       -DBOOST_INCLUDEDIR=$BOOST_PREFIX/include \
       -DBoost_NO_SYSTEM_PATHS=ON \
       ..
-    make -j $(nproc)
+    makej
+    make install
+    popd
+  fi
+}
+
+function install_kml() {
+  if [ -f "$2" ]; then
+    echo "SKIP install_kml: $2 exists"
+  else
+    download https://internal-dependencies.mapd.com/thirdparty/libkml-master.zip
+    unzip -u libkml-master.zip
+    pushd libkml-master
+    ./autogen.sh || true
+    ./configure \
+        --prefix=$1 --enable-static \
+        --disable-java --disable-python --disable-swig
+    makej
+    make install
+    popd
+  fi
+}
+
+function install_llvm() {
+  if [ -f "$2" ]; then
+    echo "SKIP install_llvm: $2 exists"
+  else
+    VERS=$LLVM_VERSION
+    download https://internal-dependencies.mapd.com/thirdparty/llvm/$VERS/llvm-$VERS.src.tar.xz
+    download https://internal-dependencies.mapd.com/thirdparty/llvm/$VERS/cfe-$VERS.src.tar.xz
+    download https://internal-dependencies.mapd.com/thirdparty/llvm/$VERS/compiler-rt-$VERS.src.tar.xz
+    download https://internal-dependencies.mapd.com/thirdparty/llvm/$VERS/lldb-$VERS.src.tar.xz
+    download https://internal-dependencies.mapd.com/thirdparty/llvm/$VERS/lld-$VERS.src.tar.xz
+    download https://internal-dependencies.mapd.com/thirdparty/llvm/$VERS/libcxx-$VERS.src.tar.xz
+    download https://internal-dependencies.mapd.com/thirdparty/llvm/$VERS/libcxxabi-$VERS.src.tar.xz
+    rm -rf llvm-$VERS.src
+    extract llvm-$VERS.src.tar.xz
+    extract cfe-$VERS.src.tar.xz
+    extract compiler-rt-$VERS.src.tar.xz
+    extract lld-$VERS.src.tar.xz
+    extract lldb-$VERS.src.tar.xz
+    extract libcxx-$VERS.src.tar.xz
+    extract libcxxabi-$VERS.src.tar.xz
+    mv cfe-$VERS.src llvm-$VERS.src/tools/clang
+    mv compiler-rt-$VERS.src llvm-$VERS.src/projects/compiler-rt
+    mv lld-$VERS.src llvm-$VERS.src/tools/lld
+    mv lldb-$VERS.src llvm-$VERS.src/tools/lldb
+    mv libcxx-$VERS.src llvm-$VERS.src/projects/libcxx
+    mv libcxxabi-$VERS.src llvm-$VERS.src/projects/libcxxabi
+    rm -rf build.llvm-$VERS
+    mkdir build.llvm-$VERS
+    pushd build.llvm-$VERS
+    $CMAKE -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX=$1 \
+      -DLLVM_ENABLE_RTTI=on \
+      -DPYTHON_EXECUTABLE=`which python` \
+       ../llvm-$VERS.src
+    makej
+    #if [ ! -d "lib/python2.7" ]; then
+    #  cp -R lib64/python2.7 lib/python2.7
+    #fi
+    make install
+    popd
+  fi
+}
+
+function install_mapdcore() {
+  if [ -f "$2" ]; then
+    echo "SKIP install_mapdcore: $2 exists"
+  else
+    download https://github.com/mapd/mapd-core/archive/v$MAPDCORE_VERSION.tar.gz
+    extract v$MAPDCORE_VERSION.tar.gz
+    mkdir -p mapd-core-$MAPDCORE_VERSION/build
+    pushd mapd-core-$MAPDCORE_VERSION/build
+    $CMAKE \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DENABLE_CUDA=off \
+      -DENABLE_AWS_S3=off \
+      -DCMAKE_INSTALL_PREFIX=$1 \
+      -DCMAKE_EXE_LINKER_FLAGS="-lssl -lcrypt -lcrypto" \
+      ..
+    makej
     make install
     popd
   fi
