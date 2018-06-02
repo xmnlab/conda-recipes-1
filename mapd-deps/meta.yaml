@@ -10,6 +10,7 @@ build:
 
 requirements:
   build:
+    - swig
 
 about:
   summary: 'The MapD Core dependencies'
@@ -21,4 +22,3 @@ about:
 extra:
   recipe-maintainers:
     - pearu
-

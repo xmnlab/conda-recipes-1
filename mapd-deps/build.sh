@@ -12,6 +12,12 @@ LOCAL_PREFIX=$PREFIX
 LOCAL_PREFIX=$RECIPE_DIR/local  # temporary, to cache succesful installations
 mkdir -p $LOCAL_PREFIX
 
+PYTHON=$SYS_PYTHON
+PYTHON_INCLUDE_DIR=$($PYTHON -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())")
+PYTHON_LIBRARY=$($PYTHON -c "import distutils.sysconfig as sc;print('{LIBDIR}/{LDLIBRARY}'.format_map(sc.get_config_vars()))")
+echo "PYTHON_INCLUDE_DIR=$PYTHON_INCLUDE_DIR"
+echo "PYTHON_LIBRARY=$PYTHON_LIBRARY"
+
 export PATH=$LOCAL_PREFIX/bin:$PREFIX/bin:$PATH
 export LD_LIBRARY_PATH=$SYSTEM_PREFIX/lib64:$SYSTEM_PREFIX/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=$LOCAL_PREFIX/lib64:$LOCAL_PREFIX/lib:$LD_LIBRARY_PATH
@@ -53,7 +59,7 @@ CentOS*)
                    unzip ncurses-devel \
                    libarchive-devel xz-devel bzip2-devel \
                    golang maven flex \
-                   swig libedit-devel"
+                   libedit-devel"
   ;;
 Ubuntu*)
   SYSTEM_INSTALL_COMMAND="$SUDO apt install --assume-yes"
@@ -157,6 +163,6 @@ download_make_install_local http://download.osgeo.org/gdal/$GDAL_VERSION/gdal-$G
 download_make_install_local https://internal-dependencies.mapd.com/thirdparty/bisonpp-1.21-45.tar.gz \
   bison++-1.21 "" $LOCAL_PREFIX/bin/bison++
 
-install_llvm $LOCAL_PREFIX $LOCAL_PREFIX/bin/SMTHclang
+install_llvm $LOCAL_PREFIX $LOCAL_PREFIX/bin/clang
 
 install_mapdcore $LOCAL_PREFIX $PREFIX/SOMETHING
