@@ -10,7 +10,7 @@ SYSTEM_PREFIX=/usr
 LOCAL_PREFIX=$PREFIX
 
 # Uncomment the following line when debugging:
-LOCAL_PREFIX=$RECIPE_DIR/local  # to cache succesful installations
+#LOCAL_PREFIX=$RECIPE_DIR/local  # to cache succesful installations
 
 mkdir -p $LOCAL_PREFIX
 
@@ -19,6 +19,8 @@ PYTHON_INCLUDE_DIR=$($PYTHON -c "from distutils.sysconfig import get_python_inc;
 PYTHON_LIBRARY=$($PYTHON -c "import distutils.sysconfig as sc;print('{LIBDIR}/{LDLIBRARY}'.format_map(sc.get_config_vars()))")
 echo "PYTHON_INCLUDE_DIR=$PYTHON_INCLUDE_DIR"
 echo "PYTHON_LIBRARY=$PYTHON_LIBRARY"
+
+export OPENSSL_PREFIX=$SYSTEM_PREFIX
 
 export PATH=$LOCAL_PREFIX/bin:$PREFIX/bin:$PATH
 export LD_LIBRARY_PATH=$SYSTEM_PREFIX/lib64:$SYSTEM_PREFIX/lib:$LD_LIBRARY_PATH
@@ -55,6 +57,8 @@ COMMON_SYSTEM_PACKAGES="wget make git autoconf autoconf-archive automake libtool
 case $TARGET in
 CentOS*)
   SYSTEM_INSTALL_COMMAND="$SUDO yum install --assumeyes"
+  SYSTEM_UNINSTALL_COMMAND="$SUDO yum remove --assumeyes"
+  export OPENSSL_PREFIX=$LOCAL_PREFIX
   #BOOST_PREFIX=$SYSTEM_PREFIX
   BOOST_PREFIX=$LOCAL_PREFIX
   BOOST_LIBDIR=$BOOST_PREFIX/lib
@@ -74,9 +78,13 @@ CentOS*)
                    libarchive-devel xz-devel bzip2-devel \
                    golang maven flex \
                    libedit-devel"
+  INSTALL_SYSTEM_COMPILER="$SYSTEM_INSTALL_COMMAND gcc gcc-c++" 
+  #UNINSTALL_SYSTEM_COMPILER="$SYSTEM_UNINSTALL_COMMAND gcc gcc-c++" 
+  UNINSTALL_SYSTEM_COMPILER=
   ;;
 Ubuntu*)
   SYSTEM_INSTALL_COMMAND="$SUDO apt install --assume-yes"
+  SYSTEM_UNINSTALL_COMMAND="$SUDO apt remove --assume-yes"
   BOOST_PREFIX=$SYSTEM_PREFIX
   BOOST_LIBDIR=$BOOST_PREFIX/lib/x86_64-linux-gnu
   BOOST_PACKAGES="libboost-context-dev \
@@ -91,12 +99,16 @@ Ubuntu*)
                    curl libcurl4-openssl-dev \
                    libdouble-conversion-dev \
                    "
+  INSTALL_SYSTEM_COMPILER="$SYSTEM_INSTALL_COMMAND gcc g++" 
+  #UNINSTALL_SYSTEM_COMPILER="$SYSTEM_UNINSTALL_COMMAND gcc g++" 
+  UNINSTALL_SYSTEM_COMPILER=
   ;;
 *)
   echo "NOTIMPL TARGET=$TARGET"
   exit 1
 
 esac
+
 
 $SYSTEM_INSTALL_COMMAND $SYSTEM_PACKAGES 
 
@@ -143,8 +155,9 @@ CentOS*)
 
   download_make_install_local https://www.openssl.org/source/openssl-1.0.2n.tar.gz \
       "" "linux-$(uname -m) no-shared no-dso -fPIC" $LOCAL_PREFIX/bin/openssl
+  # not really working for ..., but needed for llvm
   download_make_install_local https://internal-dependencies.mapd.com/thirdparty/curl-$CURL_VERSION.tar.bz2 \
-      "" "--disable-ldap --disable-ldaps --with-ssl=$LOCAL_PREFIX --enable-http" \
+      "" "--disable-ldap --disable-ldaps --with-ssl=$OPENSSL_PREFIX --enable-http" \
       $LOCAL_PREFIX/bin/curl
 
   ;;

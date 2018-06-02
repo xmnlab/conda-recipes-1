@@ -65,8 +65,8 @@ function install_gcc_deps() {
 function install_gcc() {
   if [ -f "$2" ]; then
     echo "SKIP install_gcc: $2 exists"
-  else  
-    $SYSTEM_INSTALL_COMMAND gcc-c++ gcc
+  else
+    $INSTALL_SYSTEM_COMPILER  
     #install_gcc_deps
     download ftp://ftp.gnu.org/gnu/gcc/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.xz
     extract gcc-$GCC_VERSION.tar.xz
@@ -91,7 +91,7 @@ function install_gcc() {
     makej
     make install
     popd
-    $SUDO yum remove -y gcc-c++ gcc # to make sure that gcc-5 is used   
+    $UNINSTALL_SYSTEM_COMPILER
   fi
 }
 
@@ -167,7 +167,8 @@ function install_thrift() {
       --with-qt4=no \
       --with-qt5=no \
       --with-boost=$BOOST_PREFIX \
-      --with-boost-libdir=$BOOST_LIBDIR
+      --with-boost-libdir=$BOOST_LIBDIR \
+      --with-openssl=$OPENSSL_PREFIX
     makej
     make install
     popd
@@ -226,7 +227,8 @@ function install_folly() {
     CXXFLAGS="-fPIC -pthread" ./configure --prefix=$1 \
         --enable-shared=no \
         --with-boost=$BOOST_PREFIX \
-        --with-boost-libdir=$BOOST_LIBDIR
+        --with-boost-libdir=$BOOST_LIBDIR \
+        --with-openssl=$OPENSSL_PREFIX
     makej
     make install
     popd
@@ -359,6 +361,7 @@ function install_llvm() {
       -DLLVM_ENABLE_RTTI=on \
       -DPYTHON_INCLUDE_DIR=$PYTHON_INCLUDE_DIR \
       -DPYTHON_LIBRARY=$PYTHON_LIBRARY \
+      -DLLDB_DISABLE_PYTHON=1 \
        ../llvm-$VERS.src
     makej
     #if [ ! -d "lib/python2.7" ]; then
