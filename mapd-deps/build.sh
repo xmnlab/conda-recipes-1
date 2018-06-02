@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#env
 
 # Useful environment variables
 # PREFIX - installation prefix
@@ -9,7 +8,10 @@
 SYSTEM_PREFIX=/usr
 
 LOCAL_PREFIX=$PREFIX
-LOCAL_PREFIX=$RECIPE_DIR/local  # temporary, to cache succesful installations
+
+# Uncomment the following line when debugging:
+LOCAL_PREFIX=$RECIPE_DIR/local  # to cache succesful installations
+
 mkdir -p $LOCAL_PREFIX
 
 PYTHON=$SYS_PYTHON
@@ -33,8 +35,20 @@ if [ ! -w $(dirname $SYSTEM_PREFIX) ] ; then
     SUDO=sudo
 fi
 
+# Make sure we have lsb_release
+if ! [ -x "$(command -v lsb_release)" ]; then
+  if [ -x "$(command -v yum)" ]; then
+    $SUDO yum install --assumeyes redhat-lsb-core
+  elif [ -x "$(command -v apt)" ]; then
+    $SUDO apt install --assume-yes lsb-core
+  else
+    echo "Need lsb_release to continue. EXITING."
+    exit 1
+  fi
+fi
+
 TARGET=`lsb_release -i -s`-`lsb_release -c -s`
-echo "TARGET=$TARGET" # Ubuntu-xenial, CentOS-Core
+echo "TARGET=$TARGET" # e.g. Ubuntu-xenial, CentOS-Core
 
 COMMON_SYSTEM_PACKAGES="wget make git autoconf autoconf-archive automake libtool"
 
@@ -109,6 +123,7 @@ EXPAT_VERSION=2.2.0
 LIBARCHIVE_VERSION=3.3.2
 LLVM_VERSION=3.9.1
 MAPDCORE_VERSION=3.6.0
+BISONPP_VERSION=1.21
 
 source $RECIPE_DIR/packages.sh
 
@@ -131,7 +146,6 @@ CentOS*)
   download_make_install_local https://internal-dependencies.mapd.com/thirdparty/curl-$CURL_VERSION.tar.bz2 \
       "" "--disable-ldap --disable-ldaps --with-ssl=$LOCAL_PREFIX --enable-http" \
       $LOCAL_PREFIX/bin/curl
-
 
   ;;
 Ubuntu*)
@@ -157,11 +171,12 @@ download_make_install_local http://download.osgeo.org/proj/proj-$PROJ_VERSION.ta
 download_make_install_local http://download.osgeo.org/gdal/$GDAL_VERSION/gdal-$GDAL_VERSION.tar.xz \
   "" "--without-curl --without-geos --with-libkml=$LOCAL_PREFIX --with-static-proj4=$LOCAL_PREFIX" \
   $LOCAL_PREFIX/include/gdal.h
+
 #download_make_install_local http://libarchive.org/downloads/libarchive-$LIBARCHIVE_VERSION.tar.gz \
 #  "" "--without-openssl --disable-shared" $LOCAL_PREFIX/include/archive.h
 
-download_make_install_local https://internal-dependencies.mapd.com/thirdparty/bisonpp-1.21-45.tar.gz \
-  bison++-1.21 "" $LOCAL_PREFIX/bin/bison++
+download_make_install_local https://internal-dependencies.mapd.com/thirdparty/bisonpp-$BISONPP_VERSION-45.tar.gz \
+  bison++-$BISONPP_VERSION "" $LOCAL_PREFIX/bin/bison++
 
 install_llvm $LOCAL_PREFIX $LOCAL_PREFIX/bin/clang
 
