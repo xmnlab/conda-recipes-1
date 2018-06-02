@@ -34,7 +34,8 @@ export LD_LIBRARY_PATH=$PREFIX/lib64:$PREFIX/lib:$LD_LIBRARY_PATH
 # Installing system packages requires sudo
 SUDO=
 if [ ! -w $(dirname $SYSTEM_PREFIX) ] ; then
-    SUDO=sudo
+  echo "Using sudo to install system packages."
+  SUDO=sudo
 fi
 
 # Make sure we have lsb_release
@@ -82,23 +83,80 @@ CentOS*)
   #UNINSTALL_SYSTEM_COMPILER="$SYSTEM_UNINSTALL_COMMAND gcc gcc-c++" 
   UNINSTALL_SYSTEM_COMPILER=
   ;;
+
 Ubuntu*)
   SYSTEM_INSTALL_COMMAND="$SUDO apt install --assume-yes"
   SYSTEM_UNINSTALL_COMMAND="$SUDO apt remove --assume-yes"
   BOOST_PREFIX=$SYSTEM_PREFIX
-  BOOST_LIBDIR=$BOOST_PREFIX/lib/x86_64-linux-gnu
+  BOOST_LIBDIR=$BOOST_PREFIX/lib/`arch`-linux-gnu
   BOOST_PACKAGES="libboost-context-dev \
                    libboost-thread-dev libboost-program-options-dev \
                    libboost-regex-dev \
                    libboost-system-dev libboost-chrono-dev \
-                   libboost-filesystem-dev"
+                   libboost-filesystem-dev libboost-test-dev "
   SYSTEM_PACKAGES="$COMMON_SYSTEM_PACKAGES $BOOST_PACKAGES \
                    zlib1g-dev \
                    cmake \
                    gcc-5 g++-5 \
                    curl libcurl4-openssl-dev \
-                   libdouble-conversion-dev \
+                   libdouble-conversion-dev libgflags-dev \
+                   libgoogle-glog-dev libssl-dev libgdal-dev \
+                   bison flex-old libevent-dev llvm-dev libarchive-dev \
+                   libbz2-dev liblzma-dev golang maven clang \
+                   default-jre default-jre-headless default-jdk default-jdk-headless \
                    "
+  SYSTEM_PACKAGES="$COMMON_SYSTEM_PACKAGES \
+    build-essential \
+    ccache \
+    cmake \
+    cmake-curses-gui \
+    git \
+    wget \
+    curl \
+    clang \
+    llvm \
+    llvm-dev \
+    clang-format \
+    gcc-5 \
+    g++-5 \
+    libboost-all-dev \
+    libgoogle-glog-dev \
+    golang \
+    libssl-dev \
+    libevent-dev \
+    default-jre \
+    default-jre-headless \
+    default-jdk \
+    default-jdk-headless \
+    maven \
+    libncurses5-dev \
+    libldap2-dev \
+    binutils-dev \
+    google-perftools \
+    libdouble-conversion-dev \
+    libevent-dev \
+    libgdal-dev \
+    libgflags-dev \
+    libgoogle-perftools-dev \
+    libiberty-dev \
+    libjemalloc-dev \
+    libglu1-mesa-dev \
+    liblz4-dev \
+    liblzma-dev \
+    libbz2-dev \
+    libarchive-dev \
+    libcurl4-openssl-dev \
+    uuid-dev \
+    libsnappy-dev \
+    zlib1g-dev \
+    autoconf \
+    autoconf-archive \
+    automake \
+    bison \
+    flex-old \
+   "
+
+
   INSTALL_SYSTEM_COMPILER="$SYSTEM_INSTALL_COMMAND gcc g++" 
   #UNINSTALL_SYSTEM_COMPILER="$SYSTEM_UNINSTALL_COMMAND gcc g++" 
   UNINSTALL_SYSTEM_COMPILER=
@@ -160,6 +218,25 @@ CentOS*)
       "" "--disable-ldap --disable-ldaps --with-ssl=$OPENSSL_PREFIX --enable-http" \
       $LOCAL_PREFIX/bin/curl
 
+
+  # folly dependencies:
+  install_double_conversion $LOCAL_PREFIX $LOCAL_PREFIX/include/double-conversion/double-conversion.h
+  install_gflags $LOCAL_PREFIX $LOCAL_PREFIX/include/gflags/gflags.h
+  CXXFLAGS="-fPIC" download_make_install_local https://github.com/google/glog/archive/v$GLOG_VERSION.tar.gz \
+        glog-$GLOG_VERSION "--enable-shared=no" $LOCAL_PREFIX/include/glog/logging.h
+    # --build=powerpc64le-unknown-linux-gnu"
+  download_make_install_local https://github.com/libevent/libevent/releases/download/release-$LIBEVENT_VERSION-stable/libevent-$LIBEVENT_VERSION-stable.tar.gz \
+        "" "" $LOCAL_PREFIX/include/event2/event.h
+
+  install_kml $LOCAL_PREFIX $LOCAL_PREFIX/include/kml/dom.h
+  download_make_install_local http://download.osgeo.org/proj/proj-$PROJ_VERSION.tar.gz \
+    "" "" $LOCAL_PREFIX/include/proj_api.h
+  download_make_install_local http://download.osgeo.org/gdal/$GDAL_VERSION/gdal-$GDAL_VERSION.tar.xz \
+    "" "--without-curl --without-geos --with-libkml=$LOCAL_PREFIX --with-static-proj4=$LOCAL_PREFIX" \
+    $LOCAL_PREFIX/include/gdal.h
+
+  install_llvm $LOCAL_PREFIX $LOCAL_PREFIX/bin/clang
+
   ;;
 Ubuntu*)
   export CC=gcc-5
@@ -178,12 +255,6 @@ install_arrow $LOCAL_PREFIX $LOCAL_PREFIX/include/arrow/api.h
 #download_make_install_local https://internal-dependencies.mapd.com/thirdparty/expat-$EXPAT_VERSION.tar.bz2 \
 #  "" "" $LOCAL_PREFIX/include/TODO
 
-install_kml $LOCAL_PREFIX $LOCAL_PREFIX/include/kml/dom.h
-download_make_install_local http://download.osgeo.org/proj/proj-$PROJ_VERSION.tar.gz \
-  "" "" $LOCAL_PREFIX/include/proj_api.h
-download_make_install_local http://download.osgeo.org/gdal/$GDAL_VERSION/gdal-$GDAL_VERSION.tar.xz \
-  "" "--without-curl --without-geos --with-libkml=$LOCAL_PREFIX --with-static-proj4=$LOCAL_PREFIX" \
-  $LOCAL_PREFIX/include/gdal.h
 
 #download_make_install_local http://libarchive.org/downloads/libarchive-$LIBARCHIVE_VERSION.tar.gz \
 #  "" "--without-openssl --disable-shared" $LOCAL_PREFIX/include/archive.h
@@ -191,6 +262,4 @@ download_make_install_local http://download.osgeo.org/gdal/$GDAL_VERSION/gdal-$G
 download_make_install_local https://internal-dependencies.mapd.com/thirdparty/bisonpp-$BISONPP_VERSION-45.tar.gz \
   bison++-$BISONPP_VERSION "" $LOCAL_PREFIX/bin/bison++
 
-install_llvm $LOCAL_PREFIX $LOCAL_PREFIX/bin/clang
-
-install_mapdcore $LOCAL_PREFIX $PREFIX/SOMETHING
+install_mapdcore $LOCAL_PREFIX/mapd-core $PREFIX/SOMETHING

@@ -212,13 +212,6 @@ function install_folly() {
   if [ -f "$2" ]; then
     echo "SKIP install_folly: $2 exists"
   else
-    install_double_conversion $1 $1/include/double-conversion/double-conversion.h
-    install_gflags $1 $1/include/gflags/gflags.h
-    CXXFLAGS="-fPIC" download_make_install_local https://github.com/google/glog/archive/v$GLOG_VERSION.tar.gz \
-        glog-$GLOG_VERSION "--enable-shared=no" $1/include/glog/logging.h
-    # --build=powerpc64le-unknown-linux-gnu"
-    download_make_install_local https://github.com/libevent/libevent/releases/download/release-$LIBEVENT_VERSION-stable/libevent-$LIBEVENT_VERSION-stable.tar.gz \
-        "" "" $1/include/event2/event.h
 
     download https://github.com/facebook/folly/archive/v$FOLLY_VERSION.tar.gz
     extract v$FOLLY_VERSION.tar.gz
