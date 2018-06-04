@@ -10,7 +10,12 @@ build:
 
 requirements:
   build:
-    - swig
+    - {{ compiler('cxx') }}
+    - {{ compiler('c') }}
+    - flex
+
+# ubuntu: apt-get install golang maven
+# conda-forge has : go maven
 
 about:
   summary: 'The MapD Core dependencies'

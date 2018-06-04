@@ -3,7 +3,9 @@ function download() {
 }
 
 function extract() {
-    tar xvf "$1"
+    echo "extracting $1 .." 
+    tar xf "$1"
+    echo "done"
 }
 
 function makej() {
@@ -95,42 +97,54 @@ function install_gcc() {
   fi
 }
 
+function install_bzip2() {
+  if [ -f "$2" ]; then
+    echo "SKIP install_bzip2: $2 exists"
+  else
+    BZIP2_VERSION=1.0.6
+    download http://bzip.org/$BZIP2_VERSION/bzip2-$BZIP2_VERSION.tar.gz
+    extract bzip2-$BZIP2_VERSION.tar.gz
+    pushd bzip2-$BZIP2_VERSION
+    make -j $(nproc) CFLAGS="-D_FILE_OFFSET_BITS=64 $CFLAGS" CC=$CC AR=$AR
+    make install PREFIX=$1 
+    popd
+  fi
+}
+
 function install_awscpp() {
   if [ -f "$2" ]; then
     echo "SKIP install_awscpp: $2 exists"
   else
-    echo "$1 $2 missing"
     # default c++ standard support
     CPP_STANDARD=14
     # check c++17 support
-    GNU_VERSION1=`g++ --version|head -n1|awk '{print $4}'|cut -d'.' -f1`
-    if [ "$GNU_VERSION1" = "7" ]; then
-        CPP_STANDARD=17
-    fi
-    rm -rf aws-sdk-cpp-${AWSCPP_VERSION}
+    #GNU_VERSION1=`g++ --version|head -n1|awk '{print $4}'|cut -d'.' -f1`
+    #if [ "$GNU_VERSION1" = "7" ]; then
+    #    CPP_STANDARD=17
+    #fi
+    #rm -rf aws-sdk-cpp-${AWSCPP_VERSION}
     download https://github.com/aws/aws-sdk-cpp/archive/${AWSCPP_VERSION}.tar.gz
     tar xvfz ${AWSCPP_VERSION}.tar.gz
     pushd aws-sdk-cpp-${AWSCPP_VERSION}
     mkdir build
     cd build
-    $CMAKE \
+    CXXFLAGS="$CXXFLAGS -Wno-noexcept-type" $CMAKE \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=$1 \
         -DBUILD_ONLY="s3" \
-        -DBUILD_SHARED_LIBS=0 \
         -DCUSTOM_MEMORY_MANAGEMENT=0 \
         -DCPP_STANDARD=$CPP_STANDARD \
+        -DBUILD_SHARED_LIBS=0 \
         ..
-    makej
+    make
 
     # sudo is needed on osx
-    os=`uname`
-    if [ "$os" = "Darwin" ]; then
-        sudo make install
-    else 
-        make install
-    fi
-
+    #os=`uname`
+    #if [ "$os" = "Darwin" ]; then
+    #    sudo make install
+    #else 
+    make install
+    #fi
     popd
   fi
 }
@@ -139,12 +153,12 @@ function install_boost() {
   if [ -f "$2" ]; then
     echo "SKIP install_boost: $2 exists"
   else
-    BOOST_VERSION=1_62_0
     download https://internal-dependencies.mapd.com/thirdparty/boost_$BOOST_VERSION.tar.bz2
     extract boost_$BOOST_VERSION.tar.bz2
     pushd boost_$BOOST_VERSION
+    echo "using gcc : : $CXX ; " >> tools/build/src/user-config.jam
     ./bootstrap.sh --prefix=$1
-    ./b2 cxxflags=-fPIC install --prefix=$1 || true
+    ./b2 -j $(nproc) cxxflags=-fPIC install --prefix=$1  || true
     popd
   fi
 }
@@ -158,7 +172,8 @@ function install_thrift() {
     pushd thrift-$THRIFT_VERSION
     patch -p1 < $RECIPE_DIR/thrift-3821-tmemorybuffer-overflow-check.patch
     patch -p1 < $RECIPE_DIR/thrift-3821-tmemorybuffer-overflow-test.patch
-    CFLAGS="-fPIC" CXXFLAGS="-fPIC" JAVA_PREFIX=$PREFIX/lib ./configure \
+    #CFLAGS="-fPIC" CXXFLAGS="-fPIC" JAVA_PREFIX=$PREFIX/lib 
+    ./configure \
       --prefix=$1 \
       --with-lua=no \
       --with-python=no \
@@ -167,8 +182,10 @@ function install_thrift() {
       --with-qt4=no \
       --with-qt5=no \
       --with-boost=$BOOST_PREFIX \
-      --with-boost-libdir=$BOOST_LIBDIR \
-      --with-openssl=$OPENSSL_PREFIX
+      --with-openssl=$OPENSSL_PREFIX \
+      --with-boost-libdir=$BOOST_LIBDIR  \
+      --disable-shared
+
     makej
     make install
     popd
@@ -217,8 +234,7 @@ function install_folly() {
     extract v$FOLLY_VERSION.tar.gz
     pushd folly-$FOLLY_VERSION/folly
     autoreconf -ivf
-    CXXFLAGS="-fPIC -pthread" ./configure --prefix=$1 \
-        --enable-shared=no \
+    CXXFLAGS="$CXXFLAGS -pthread" ./configure --prefix=$1 \
         --with-boost=$BOOST_PREFIX \
         --with-boost-libdir=$BOOST_LIBDIR \
         --with-openssl=$OPENSSL_PREFIX
@@ -237,9 +253,8 @@ function install_rapidjson() {
     extract v$RAPIDJSON_VERSION.tar.gz
     mkdir -p rapidjson-$RAPIDJSON_VERSION/build
     pushd rapidjson-$RAPIDJSON_VERSION/build
-    $CMAKE \
-       -DCMAKE_CXX_FLAGS="-fPIC" \
-       -DCMAKE_INSTALL_PREFIX:PATH=$1 \
+    CXXFLAGS="$CXXFLAGS -Wno-implicit-fallthrough" $CMAKE \
+       -DCMAKE_INSTALL_PREFIX=$1 \
        ..             
     makej
     make install
@@ -255,9 +270,8 @@ function install_flatbuffers() {
     extract v$FLATBUFFERS_VERSION.tar.gz
     mkdir -p flatbuffers-$FLATBUFFERS_VERSION/build
     pushd flatbuffers-$FLATBUFFERS_VERSION/build
-    $CMAKE \
-       -DCMAKE_CXX_FLAGS="-fPIC" \
-       -DCMAKE_INSTALL_PREFIX:PATH=$1 \
+    CXXFLAGS="$CXXFLAGS" $CMAKE \
+       -DCMAKE_INSTALL_PREFIX=$1 \
        -DFLATBUFFERS_BUILD_TESTS=OFF \
        ..
     makej
@@ -270,6 +284,7 @@ function install_arrow() {
   if [ -f "$2" ]; then
     echo "SKIP install_arrow: $2 exists"
   else
+    # TODO: try to eliminate this:
     # workaround "libcurl w/o https support" issue:
     install_rapidjson $1 $1/include/rapidjson/rapidjson.h
     export RAPIDJSON_HOME=$1
@@ -282,8 +297,6 @@ function install_arrow() {
     pushd arrow-apache-arrow-$ARROW_VERSION/cpp/build
     $CMAKE \
       -DCMAKE_BUILD_TYPE=Release \
-      -DARROW_BUILD_SHARED=ON \
-      -DARROW_BUILD_STATIC=ON \
       -DARROW_BUILD_TESTS=OFF \
       -DARROW_BUILD_BENCHMARKS=OFF \
       -DARROW_WITH_BROTLI=OFF \
@@ -296,6 +309,7 @@ function install_arrow() {
       -DBOOST_LIBRARYDIR=$BOOST_LIBDIR \
       -DBOOST_INCLUDEDIR=$BOOST_PREFIX/include \
       -DBoost_NO_SYSTEM_PATHS=ON \
+      -DPTHREAD_LIBRARY=$PTHREAD_LIBRARY \
       ..
     makej
     make install
@@ -303,17 +317,22 @@ function install_arrow() {
   fi
 }
 
-function install_kml() {
+function install_libkml() {
   if [ -f "$2" ]; then
-    echo "SKIP install_kml: $2 exists"
+    echo "SKIP install_libkml: $2 exists"
   else
-    download https://internal-dependencies.mapd.com/thirdparty/libkml-master.zip
-    unzip -u libkml-master.zip
-    pushd libkml-master
-    ./autogen.sh || true
-    ./configure \
-        --prefix=$1 --enable-static \
-        --disable-java --disable-python --disable-swig
+    LIBKML_VERSION=1.3.0
+    #download https://internal-dependencies.mapd.com/thirdparty/libkml-master.zip
+    download https://github.com/libkml/libkml/archive/$LIBKML_VERSION.tar.gz
+    extract $LIBKML_VERSION.tar.gz
+    mkdir -p libkml-$LIBKML_VERSION/build
+    pushd libkml-$LIBKML_VERSION/build
+
+    $CMAKE \
+        -DCMAKE_INSTALL_PREFIX=$1 \
+        -DBUILD_TESTING=OFF \
+        ..
+
     makej
     make install
     popd
@@ -325,6 +344,7 @@ function install_llvm() {
     echo "SKIP install_llvm: $2 exists"
   else
     VERS=$LLVM_VERSION
+    #if ! [ true ]; then
     download https://internal-dependencies.mapd.com/thirdparty/llvm/$VERS/llvm-$VERS.src.tar.xz
     download https://internal-dependencies.mapd.com/thirdparty/llvm/$VERS/cfe-$VERS.src.tar.xz
     download https://internal-dependencies.mapd.com/thirdparty/llvm/$VERS/compiler-rt-$VERS.src.tar.xz
@@ -332,7 +352,6 @@ function install_llvm() {
     download https://internal-dependencies.mapd.com/thirdparty/llvm/$VERS/lld-$VERS.src.tar.xz
     download https://internal-dependencies.mapd.com/thirdparty/llvm/$VERS/libcxx-$VERS.src.tar.xz
     download https://internal-dependencies.mapd.com/thirdparty/llvm/$VERS/libcxxabi-$VERS.src.tar.xz
-    rm -rf llvm-$VERS.src
     extract llvm-$VERS.src.tar.xz
     extract cfe-$VERS.src.tar.xz
     extract compiler-rt-$VERS.src.tar.xz
@@ -346,9 +365,15 @@ function install_llvm() {
     mv lldb-$VERS.src llvm-$VERS.src/tools/lldb
     mv libcxx-$VERS.src llvm-$VERS.src/projects/libcxx
     mv libcxxabi-$VERS.src llvm-$VERS.src/projects/libcxxabi
-    rm -rf build.llvm-$VERS
+
+    # fix missing include discovered by gcc-7 (todo: prepare a patch)
+    FN=llvm-$VERS.src/tools/lldb/include/lldb/Utility/TaskPool.h
+    sed -i "/#include <vector>/a#include <functional>" $FN
     mkdir build.llvm-$VERS
+    #fi
     pushd build.llvm-$VERS
+
+    # todo: remove PYTHON_* variables:
     $CMAKE -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX=$1 \
       -DLLVM_ENABLE_RTTI=on \
@@ -356,6 +381,7 @@ function install_llvm() {
       -DPYTHON_LIBRARY=$PYTHON_LIBRARY \
       -DLLDB_DISABLE_PYTHON=1 \
        ../llvm-$VERS.src
+
     makej
     #if [ ! -d "lib/python2.7" ]; then
     #  cp -R lib64/python2.7 lib/python2.7
@@ -373,13 +399,21 @@ function install_mapdcore() {
     extract v$MAPDCORE_VERSION.tar.gz
     mkdir -p mapd-core-$MAPDCORE_VERSION/build
     pushd mapd-core-$MAPDCORE_VERSION/build
+    CXXFLAGS="$CXXFLAGS -I$PTHREAD_INCLUDE_DIR"
+    #export CXXFLAGS="${CXXFLAGS/-D_FORTIFY_SOURCE=2/}"
+
+    # an ugly patch to fix a compilation error (gcc-7 and always_inline w/o inline):
+    echo -e "\n#ifndef __CUDACC__\n#undef ALWAYS_INLINE\n#define ALWAYS_INLINE inline __attribute__((always_inline))\n#endif" >> ../Shared/funcannotations.h
+
     $CMAKE \
       -DCMAKE_BUILD_TYPE=Release \
       -DENABLE_CUDA=off \
       -DENABLE_AWS_S3=off \
       -DCMAKE_INSTALL_PREFIX=$1 \
-      -DCMAKE_EXE_LINKER_FLAGS="-lssl -lcrypt -lcrypto" \
       ..
+    #  -DCMAKE_EXE_LINKER_FLAGS="-lssl -lcrypt -lcrypto" \
+    #
+    #make
     makej
     make install
     popd
