@@ -25,6 +25,7 @@ if ! [ $DEBUG ]; then
   # needed when building mapd-core
   export LDFLAGS="$LDFLAGS -Wl,-rpath,$LOCAL_PREFIX/lib"
 fi
+# for mapd-core:
 
 # fix include file issues when building llvm/lldb:
 CXXFLAGS="-I$LOCAL_PREFIX/include/ncurses -I$LOCAL_PREFIX/include/libxml2 $CXXFLAGS"

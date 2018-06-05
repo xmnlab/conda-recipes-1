@@ -17,6 +17,10 @@ requirements:
 # ubuntu: apt-get install golang maven
 # conda-forge has : go maven
 
+#test:
+#  commands:
+#    - mapdql --version
+
 about:
   summary: 'The MapD Core dependencies'
 

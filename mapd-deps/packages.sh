@@ -400,20 +400,17 @@ function install_mapdcore() {
     mkdir -p mapd-core-$MAPDCORE_VERSION/build
     pushd mapd-core-$MAPDCORE_VERSION/build
     CXXFLAGS="$CXXFLAGS -I$PTHREAD_INCLUDE_DIR"
-    #export CXXFLAGS="${CXXFLAGS/-D_FORTIFY_SOURCE=2/}"
 
     # an ugly patch to fix a compilation error (gcc-7 and always_inline w/o inline):
-    echo -e "\n#ifndef __CUDACC__\n#undef ALWAYS_INLINE\n#define ALWAYS_INLINE inline __attribute__((always_inline))\n#endif" >> ../Shared/funcannotations.h
-
+    sed -i -e 's/#define ALWAYS_INLINE /#define ALWAYS_INLINE\n#define ALWAYS_INLINE_ORIG /g' ../Shared/funcannotations.h
+    #LDFLAGS="$LDFLAGS -lssl -lcrypt -lcrypto -lgdal -larchive -lxml2 -lcurl"
     $CMAKE \
-      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_BUILD_TYPE=release \
       -DENABLE_CUDA=off \
       -DENABLE_AWS_S3=off \
       -DCMAKE_INSTALL_PREFIX=$1 \
+      -DENABLE_TESTS=off \
       ..
-    #  -DCMAKE_EXE_LINKER_FLAGS="-lssl -lcrypt -lcrypto" \
-    #
-    #make
     makej
     make install
     popd

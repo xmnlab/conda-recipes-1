@@ -505,7 +505,7 @@ system)
   esac
   ;;
 source)
-  install_mapdcore $LOCAL_PREFIX/mapd-core $PREFIX/SOMETHING
+  install_mapdcore $LOCAL_PREFIX/mapd-core $LOCAL_PREFIX/mapd-core/bin/mapdql
   ;;
 *) echo "MAPDCORE_RULE NOTIMPL: $MAPDCORE_RULE"
 esac
