@@ -82,6 +82,22 @@ source)
 *) echo "ZLIB_RULE NOTIMPL: $ZLIB_RULE"
 esac
 
+case $LIBPNG_RULE in
+skip) ;;
+system)
+  case $TARGET in
+  *)
+    echo "LIBPNG_RULE/TARGET NOTIMPL: $LIBPNG_RULE/$TARGET"
+  esac
+  ;;
+source)
+  LIBPNG_VERSION=1.6.21
+  download_make_install_local https://internal-dependencies.mapd.com/thirdparty/libpng-$LIBPNG_VERSION.tar.xz \
+    "" "" $LOCAL_PREFIX/include/libpng16/png.h
+  ;;
+*) echo "LIBPNG_RULE NOTIMPL: $LIBPNG_RULE"
+esac
+
 case $BZIP2_RULE in
 skip) ;;
 system)
@@ -477,23 +493,6 @@ source)
   ;;
 *) echo "ARROW_RULE NOTIMPL: $ARROW_RULE"
 esac
-
-case $LIBPNG_RULE in
-skip) ;;
-system)
-  case $TARGET in
-  *)
-    echo "LIBPNG_RULE/TARGET NOTIMPL: $LIBPNG_RULE/$TARGET"
-  esac
-  ;;
-source)
-  LIBPNG_VERSION=1.6.21
-  download_make_install_local https://internal-dependencies.mapd.com/thirdparty/libpng-$LIBPNG_VERSION.tar.xz \
-    "" "" $LOCAL_PREFIX/include/libpng16/png.h
-  ;;
-*) echo "LIBPNG_RULE NOTIMPL: $LIBPNG_RULE"
-esac
-
 
 
 case $MAPDCORE_RULE in

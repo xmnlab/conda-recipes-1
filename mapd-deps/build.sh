@@ -12,20 +12,18 @@ export CXXFLAGS="-I$BUILD_PREFIX/include $CXXFLAGS"
 export LDFLAGS="-L$BUILD_PREFIX/lib $LDFLAGS"
 export LDFLAGS="$LDFLAGS -Wl,-rpath,$BUILD_PREFIX/lib"
 
-
 # Enable the following if-block when debugging:
 DEBUG=true
 if ! [ $DEBUG ]; then
   LOCAL_PREFIX=$RECIPE_DIR/local  # to cache succesful installations
   mkdir -p $LOCAL_PREFIX
-  export CFLAGS="-I$LOCAL_PREFIX/include $CFLAGS"
-  export CPPFLAGS="-I$LOCAL_PREFIX/include $CPPFLAGS"
-  export CXXFLAGS="-I$LOCAL_PREFIX/include $CXXFLAGS"
-  export LDFLAGS="-L$LOCAL_PREFIX/lib $LDFLAGS"
-  # needed when building mapd-core
-  export LDFLAGS="$LDFLAGS -Wl,-rpath,$LOCAL_PREFIX/lib"
 fi
-# for mapd-core:
+export CFLAGS="-I$LOCAL_PREFIX/include $CFLAGS"
+export CPPFLAGS="-I$LOCAL_PREFIX/include $CPPFLAGS"
+export CXXFLAGS="-I$LOCAL_PREFIX/include $CXXFLAGS"
+export LDFLAGS="-L$LOCAL_PREFIX/lib $LDFLAGS"
+# needed when building mapd-core
+export LDFLAGS="$LDFLAGS -Wl,-rpath,$LOCAL_PREFIX/lib"
 
 # fix include file issues when building llvm/lldb:
 CXXFLAGS="-I$LOCAL_PREFIX/include/ncurses -I$LOCAL_PREFIX/include/libxml2 $CXXFLAGS"
