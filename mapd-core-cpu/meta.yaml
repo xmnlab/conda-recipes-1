@@ -17,27 +17,6 @@ build:
 
 requirements:
   build:
-    - cmake
-    - clangdev
-    - llvmdev
-    - go
-    - boost
-    - openjdk
-    - gperftools
-    - glog
-    - gflags
-    - double-conversion
-    - gdal
-    - folly
-    - arrow-cpp 0.7.1
-    - thrift
-    - thrift-cpp
-    - blosc
-    - toolchain
-    - libarchive
-    - maven
-    - bison
-    - bisonpp
   run:
     - llvmdev
     - go
@@ -47,10 +26,6 @@ requirements:
     - gdal
     - arrow-cpp 0.7.1
 
-test:
-  commands:
-    - mapdql --version
- 
 about:
   home: https://www.mapd.com/
   license: Apache-2.0

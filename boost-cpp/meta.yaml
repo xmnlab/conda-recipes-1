@@ -18,7 +18,7 @@ build:
 
 requirements:
   build:
-    - {{ compiler('cxx') }} 5.*
+    - {{ compiler('cxx') }}
     - python            # [win]
     - icu 58.*          # [unix]
     - bzip2 1.0.*       # [unix]
