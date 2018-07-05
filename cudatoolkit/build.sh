@@ -1,98 +1,64 @@
 #!/bin/bash
 
-# wget -c https://developer.nvidia.com/compute/cuda/9.2/Prod/local_installers/cuda_9.2.88_396.26_linux
+# sha256=8d02cc2a82f35b456d447df463148ac4cc823891be8820948109ad6186f2667c
+filename="cuda_${PKG_VERSION}_linux"
+# download_url=https://developer.nvidia.com/compute/cuda/$PKG_VERSION/Prod/local_installers/$filename
+# download_dir=$CONDA_PREFIX/conda-bld/src_cache
+install_dir=$CONDA_PREFIX/tmp/cuda
 
-chmod +x cuda_9.2.88_396.26_linux
-./cuda_9.2.88_396.26_linux --silent --toolkit --toolkitpath=$BUILD_PREFIX/cuda/
+mkdir -p $install_dir
+mkdir -p $PREFIX/{lib,include}
 
-mkdir $PREFIX/lib
-mkdir $PREFIX/include
+# wget -c -o $download_dir/$filename $download_url
 
-# Component : CUDA Runtime
-#   Linux   : libcudart.so, libcudart_static.a, libcudadevrt.a
-find $BUILD_PREFIX/cuda -type f -name "libcudart.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libcudart_static.a*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libcudadevrt.a*"  -exec cp {} find $PREFIX/lib \;
-# Component : CUDA FFT Library
-#   Linux   : libcufft.so, libcufft_static.a, libcufftw.so, libcufftw_static.a
-find $BUILD_PREFIX/cuda -type f -name "libcufft.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libcufft_static.a*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libcufftw.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libcufftw_static.a*"  -exec cp {} find $PREFIX/lib \;
-# Component : CUDA BLAS Library
-#   Linux   : libcublas.so, libcublas_static.a, libcublas_device.a
-find $BUILD_PREFIX/cuda -type f -name "libcublas.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libcublas_static.a*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libcublas_device.a*"  -exec cp {} find $PREFIX/lib \;
-# Component : NVIDIA "Drop-in" BLAS Library
-#   Linux   : libnvblas.so
-find $BUILD_PREFIX/cuda -type f -name "libnvblas.so*"  -exec cp {} find $PREFIX/lib \;
-# Component : CUDA Sparse Matrix Library
-#   Linux   : libcusparse.so, libcusparse_static.a
-find $BUILD_PREFIX/cuda -type f -name "libcusparse.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libcusparse_static.a*"  -exec cp {} find $PREFIX/lib \;
-# Component : CUDA Linear Solver Library
-#    Linux   : libcusolver.so, libcusolver_static.a
-find $BUILD_PREFIX/cuda -type f -name "libcusolver.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libcusolver_static.a*"  -exec cp {} find $PREFIX/lib \;
-# Component : CUDA Random Number Generation Library
-#   Linux   : libcurand.so, libcurand_static.a
-find $BUILD_PREFIX/cuda -type f -name "libcurand.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name " libcurand_static.a*"  -exec cp {} find $PREFIX/lib \;
-# Component : CUDA Accelerated Graph Library
-#   Linux   : libnvgraph.so, libnvgraph_static.a
-find $BUILD_PREFIX/cuda -type f -name "libnvgraph.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnvgraph_static.a*"  -exec cp {} find $PREFIX/lib \;
-# Component : NVIDIA Performance Primitives Library
-#   Linux   : 
-# libnppc.so, libnppc_static.a, libnppial.so, libnppial_static.a, libnppicc.so, 
-find $BUILD_PREFIX/cuda -type f -name "libnppc.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppc_static.a*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppial.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppial_static.a*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppicc.so*"  -exec cp {} find $PREFIX/lib \;
-# libnppicc_static.a, libnppicom.so, libnppicom_static.a, libnppidei.so, libnppidei_static.a,
-find $BUILD_PREFIX/cuda -type f -name "libnppicc_static.a*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppicom.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppicom_static.a*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppidei.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppidei_static.a*"  -exec cp {} find $PREFIX/lib \;
-# libnppif.so, libnppif_static.a, libnppig.so, libnppig_static.a, libnppim.so, libnppim_static.a,
-find $BUILD_PREFIX/cuda -type f -name "libnppif.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppif_static.a*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppig.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppig_static.a*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppim.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppim_static.a*"  -exec cp {} find $PREFIX/lib \;
-# libnppist.so, libnppist_static.a, libnppisu.so, libnppisu_static.a, libnppitc.so, 
-find $BUILD_PREFIX/cuda -type f -name "libnppist.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppist_static.a*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppisu.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppisu_static.a*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnppitc.so*"  -exec cp {} find $PREFIX/lib \;
-# libnppitc_static.a, libnpps.so, libnpps_static.a
-find $BUILD_PREFIX/cuda -type f -name "libnppitc_static.a*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnpps.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnpps_static.a*"  -exec cp {} find $PREFIX/lib \;
-# Component : Internal common library required for statically linking to cuBLAS, cuSPARSE, cuFFT, cuRAND and NPP
-#   Linux   : libculibos.a
-find $BUILD_PREFIX/cuda -type f -name "libculibos.a*"  -exec cp {} find $PREFIX/lib \;
-# Component : NVIDIA Runtime Compilation Library
-#   Linux   : libnvrtc.so, libnvrtc-builtins.so
-find $BUILD_PREFIX/cuda -type f -name "libnvrtc.so*"  -exec cp {} find $PREFIX/lib \;
-find $BUILD_PREFIX/cuda -type f -name "libnvrtc-builtins.so*"  -exec cp {} find $PREFIX/lib \;
-# Component : NVIDIA Optimizing Compiler Library
-#   Linux   : libnvvm.so
-find $BUILD_PREFIX/cuda -type f -name "libnvvm.so*"  -exec cp {} find $PREFIX/lib \;
-# Component : NVIDIA Common Device Math Functions Library
-#   Linux   : libdevice.10.bc
-find $BUILD_PREFIX/cuda -type f -name "libdevice.10.bc*"  -exec cp {} find $PREFIX/lib \;
-# Component : CUDA Occupancy Calculation Header Library
-#   All     : cuda_occupancy.h
-find $BUILD_PREFIX/cuda -type f -name "cuda_occupancy.h*"  -exec cp {} find $PREFIX/include \;
-# Component : CUDA Profiling Tools Interface (CUPTI) Library
-#   Linux   : libcupti.so
-find $BUILD_PREFIX/cuda -type f -name "libcupti.so*"  -exec cp {} find $PREFIX/lib \;
-# Component : NVIDIA Tools Extension Library
-#   Linux   : libnvToolsExt.so
-find $BUILD_PREFIX/cuda -type f -name "libnvToolsExt.so*"  -exec cp {} find $PREFIX/lib \;
+# TODO: check sha256
+
+chmod +x $filename
+sh $filename --silent --toolkit --toolkitpath=$install_dir --override
+
+# remove unnecessary folders
+excluded_dirs="bin doc extras jre libnsight libnvvp nsightee_plugins nvml pkgconfig samples tools"
+for f in $excluded_dirs
+do
+    rm -rf $install_dir/$f
+done
+
+cuda_libs="libcudart.so libcudart_static.a libcudadevrt.a"
+cuda_libs+=" libcufft.so libcufft_static.a libcufftw.so libcufftw_static.a"
+cuda_libs+=" libcublas.so libcublas_static.a libcublas_device.a"
+cuda_libs+=" libnvblas.so"
+cuda_libs+=" libcusparse.so libcusparse_static.a"
+cuda_libs+=" libcusolver.so libcusolver_static.a"
+cuda_libs+=" libcurand.so libcurand_static.a"
+cuda_libs+=" libnvgraph.so libnvgraph_static.a"
+cuda_libs+=" libnppc.so libnppc_static.a libnppial.so libnppial_static.a"
+cuda_libs+=" libnppicc.so libnppicc_static.a libnppicom.so"
+cuda_libs+=" libnppicom_static.a libnppidei.so libnppidei_static.a" 
+cuda_libs+=" libnppif.so libnppif_static.a libnppig.so libnppig_static.a"
+cuda_libs+=" libnppim.so libnppim_static.a libnppist.so libnppist_static.a"
+cuda_libs+=" libnppisu.so libnppisu_static.a libnppitc.so"
+cuda_libs+=" libnppitc_static.a libnpps.so libnpps_static.a"
+cuda_libs+=" libculibos.a"
+cuda_libs+=" libnvrtc.so libnvrtc-builtins.so"
+cuda_libs+=" libnvvm.so"
+cuda_libs+=" libdevice.10.bc"
+cuda_libs+=" libcupti.so"
+cuda_libs+=" libnvToolsExt.so"
+
+cuda_h="cuda_occupancy.h"
+
+echo "Copying lib files:"
+for f in $cuda_libs
+do
+    echo "- $f ..."
+    find $install_dir -name "${f}*"  -exec cp -a {} $PREFIX/lib \;
+done
+
+echo "Copying header files:"
+for f in $cuda_h
+do
+    echo "- $f ..."
+    find $install_dir -name "${f}*"  -exec cp -a {} $PREFIX/include \;
+done
+
+rm -rf $install_dir

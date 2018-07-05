@@ -1,33 +1,26 @@
 {% set name = "cudatoolkit" %}
-{% set major_version = "9.2" %}
-{% set minor_version = "88_396.26"%}
-{% set sha256 = "8d02cc2a82f35b456d447df463148ac4cc823891be8820948109ad6186f2667c" %}
-{% set filename = "cuda_" + major_version + "." +  minor_version + "_linux" %}
+{% set version = "9.2.88_396.26" %}
+{% set major_version = '.'.join(version.split('.')[:2]) %}
 
 package:
   name: {{ name|lower }}
-  version: {{ major_version }}.{{ minor_version }}
+  version: {{ version }}
 
-#source:
-#  path: /home/dev/var/cudatoolkit-9_0-x86_64/build/scripts
+# source:
+#   path: /home/dev/var/cudatoolkit-9_0-x86_64/build/scripts
 
 source:
-  fn: {{ filename }}
-  url: https://developer.nvidia.com/compute/cuda/{{ major_version }}/Prod/local_installers/{{ filename }}
-  sha256: {{ sha256 }}
+  - url: https://developer.nvidia.com/compute/cuda/{{ major_version }}/Prod/local_installers/{{ "cuda_" + version + "_linux" }}  # [ linux ]
+    sha256: 8d02cc2a82f35b456d447df463148ac4cc823891be8820948109ad6186f2667c  # [ linux ]
+    fn: {{ "cuda_" + version + "_linux" }}  # [ linux ]
 
 build:
   number: 0
   skip: true  # [not linux]
 
-requirements:
-  build:
-    - {{ compiler('cxx') }}
-    - python >=3
-    - requests
-    - conda
-    - pyyaml
-    - wget
+# requirements:
+#   build:
+#     - wget
 
 test:
   requires:
