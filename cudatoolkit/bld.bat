@@ -1,6 +1,6 @@
 ECHO Building cudatoolkit ...
 
-SET filename=cuda_%PKG_VERSION%
+SET filename=cuda_%PKG_VERSION%.exe
 SET install_dir=%CONDA_PREFIX%\tmp\cuda
 
 mkdir %install_dir%
