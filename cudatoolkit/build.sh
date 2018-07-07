@@ -1,49 +1,46 @@
 #!/bin/bash
 
-# sha256=8d02cc2a82f35b456d447df463148ac4cc823891be8820948109ad6186f2667c
-filename="cuda_${PKG_VERSION}_linux"
-# download_url=https://developer.nvidia.com/compute/cuda/$PKG_VERSION/Prod/local_installers/$filename
-# download_dir=$CONDA_PREFIX/conda-bld/src_cache
+set -ex
+
+echo "Building cudatoolkit ..."
+
+filename="cuda_${PKG_VERSION}"
 install_dir=$CONDA_PREFIX/tmp/cuda
 
 mkdir -p $install_dir
 mkdir -p $PREFIX/{lib,include}
 
-# wget -c -o $download_dir/$filename $download_url
+chmod ugo+x $filename
+./$filename --silent --toolkit --toolkitpath=$install_dir --override
 
-# TODO: check sha256
-
-chmod +x $filename
-sh $filename --silent --toolkit --toolkitpath=$install_dir --override
-
-# remove unnecessary folders
+echo "Removing unnecessary folders"
 excluded_dirs="bin doc extras jre libnsight libnvvp nsightee_plugins nvml pkgconfig samples tools"
 for f in $excluded_dirs
 do
     rm -rf $install_dir/$f
 done
 
-cuda_libs="libcudart.so libcudart_static.a libcudadevrt.a"
-cuda_libs+=" libcufft.so libcufft_static.a libcufftw.so libcufftw_static.a"
-cuda_libs+=" libcublas.so libcublas_static.a libcublas_device.a"
-cuda_libs+=" libnvblas.so"
-cuda_libs+=" libcusparse.so libcusparse_static.a"
-cuda_libs+=" libcusolver.so libcusolver_static.a"
-cuda_libs+=" libcurand.so libcurand_static.a"
-cuda_libs+=" libnvgraph.so libnvgraph_static.a"
-cuda_libs+=" libnppc.so libnppc_static.a libnppial.so libnppial_static.a"
-cuda_libs+=" libnppicc.so libnppicc_static.a libnppicom.so"
-cuda_libs+=" libnppicom_static.a libnppidei.so libnppidei_static.a" 
-cuda_libs+=" libnppif.so libnppif_static.a libnppig.so libnppig_static.a"
-cuda_libs+=" libnppim.so libnppim_static.a libnppist.so libnppist_static.a"
-cuda_libs+=" libnppisu.so libnppisu_static.a libnppitc.so"
-cuda_libs+=" libnppitc_static.a libnpps.so libnpps_static.a"
-cuda_libs+=" libculibos.a"
-cuda_libs+=" libnvrtc.so libnvrtc-builtins.so"
-cuda_libs+=" libnvvm.so"
+cuda_libs="libcudart libcudart_static libcudadevrt"
+cuda_libs+=" libcufft libcufft_static libcufftw libcufftw_static"
+cuda_libs+=" libcublas libcublas_static libcublas_device"
+cuda_libs+=" libnvblas"
+cuda_libs+=" libcusparse libcusparse_static"
+cuda_libs+=" libcusolver libcusolver_static"
+cuda_libs+=" libcurand libcurand_static"
+cuda_libs+=" libnvgraph libnvgraph_static"
+cuda_libs+=" libnppc libnppc_static libnppial libnppial_static"
+cuda_libs+=" libnppicc libnppicc_static libnppicom"
+cuda_libs+=" libnppicom_static libnppidei libnppidei_static" 
+cuda_libs+=" libnppif libnppif_static libnppig libnppig_static"
+cuda_libs+=" libnppim libnppim_static libnppist libnppist_static"
+cuda_libs+=" libnppisu libnppisu_static libnppitc"
+cuda_libs+=" libnppitc_static libnpps libnpps_static"
+cuda_libs+=" libculibos"
+cuda_libs+=" libnvrtc libnvrtc-builtins"
+cuda_libs+=" libnvvm"
 cuda_libs+=" libdevice.10.bc"
-cuda_libs+=" libcupti.so"
-cuda_libs+=" libnvToolsExt.so"
+cuda_libs+=" libcupti"
+cuda_libs+=" libnvToolsExt"
 
 cuda_h="cuda_occupancy.h"
 
@@ -61,4 +58,5 @@ do
     find $install_dir -name "${f}*"  -exec cp -a {} $PREFIX/include \;
 done
 
+echo "Removing installation folder"
 rm -rf $install_dir
