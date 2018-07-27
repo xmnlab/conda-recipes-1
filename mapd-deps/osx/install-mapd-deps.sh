@@ -5,6 +5,7 @@ PWD=$(pwd)
 tmp_dir=$CONDA_PREFIX/tmp/mapd-core
 
 mkdir -p $tmp_dir
+rm -rf $tmp_dir/*
 cd $tmp_dir
 
 git clone --depth 1 https://github.com/mapd/mapd-core.git
