@@ -4,7 +4,8 @@ set -e
 set -x
 
 UNAME=`uname`
-if [[ $UNAME == "Darwim" ]]; then
+if [[ $UNAME == "Darwin" ]]; then
+    INSTALL_PREFIX=$PREFIX
     PREFIX=/usr/local
     SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
     source $SCRIPTS_DIR/common-functions.sh
@@ -75,4 +76,5 @@ export DYLD_LIBRARY_PATH PATH
 EOF
     
     source ~/.bash_profile
+    PREFIX=$INSTALL_PREFIX
 fi
