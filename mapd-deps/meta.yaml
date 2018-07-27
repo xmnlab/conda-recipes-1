@@ -6,7 +6,7 @@ package:
   version: {{ version }}
 
 build:
-  skip: True # [not linux]
+  skip: True # [win]
 
 requirements:
   build:
@@ -14,20 +14,14 @@ requirements:
     - {{ compiler('c') }}
     - flex
 
-# ubuntu: apt-get install golang maven
-# conda-forge has : go maven
-
-#test:
-#  commands:
-#    - mapdql --version
-
 about:
   summary: 'The MapD Core dependencies'
 
   description: |
     Build MapD Core dependencies using system libraries as well as
-    from sources. Supported systems: Ubuntu, CentOS.
+    from sources. Supported systems: Ubuntu, CentOS. Also osx is supported using post-link.
 
 extra:
   recipe-maintainers:
     - pearu
+    - xmnlab
