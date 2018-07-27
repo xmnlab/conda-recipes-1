@@ -5,5 +5,5 @@ set -x
 
 UNAME=`uname`
 if [[ $UNAME == "Darwin" ]]; then
-    source $PREFIX/bin/mapd-deps-osx.sh
+    source $PREFIX/bin/install-mapd-deps.sh
 fi

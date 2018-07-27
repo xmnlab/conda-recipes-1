@@ -13,6 +13,7 @@ requirements:
     - {{ compiler('cxx') }}
     - {{ compiler('c') }}
     - flex
+    - git [osx]
 
 about:
   summary: 'The MapD Core dependencies'

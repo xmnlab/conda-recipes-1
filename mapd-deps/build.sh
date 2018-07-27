@@ -8,5 +8,5 @@ if [[ $UNAME == "Linux" ]]; then
     source build.sh
     cd $PWD
 else
-   cp -R common-functions.sh osx/* $PREFIX/bin/
+   cp -R osx/* $PREFIX/bin/
 fi
