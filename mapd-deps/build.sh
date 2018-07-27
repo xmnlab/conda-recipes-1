@@ -8,5 +8,5 @@ if [[ $UNAME == "Linux" ]]; then
     source build.sh
     cd $PWD
 else
-   cp -R osx/* $PREFIX/bin/
+   cp -R $RECIPE_DIR/osx/* $PREFIX/bin/
 fi
