@@ -17,13 +17,13 @@ build:
 requirements:
   build:
   run:
-    - llvmdev  # [osx]
-    - go  # [osx]
-    - boost  # [osx]
-    - openjdk  # [osx]
-    - gperftools  # [osx]
-    - gdal  # [osx]
-    - arrow-cpp 0.7.1  # [osx]
+    - llvmdev  # [not osx]
+    - go  # [not osx]
+    - boost  # [not osx]
+    - openjdk  # [not osx]
+    - gperftools  # [not osx]
+    - gdal  # [not osx]
+    - arrow-cpp 0.7.1  # [not osx]
 
 about:
   home: https://www.mapd.com/
