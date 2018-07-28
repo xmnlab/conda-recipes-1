@@ -1,30 +1,29 @@
 {% set name = "mapd-core-cpu" %}
-{% set version = "3.6.0" %}
-{% set sha256 = "402140dc5189f6b7bd82bd8c551040981131f6eb79745031521b4fe77310aaab" %}
+{% set version = "4.0.1" %}
+{% set sha256 = "4e49bf3a9453188b4aec4f8f1318f1ffb381412cf6e85488b07bdaab6808cc1f" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  # fn: {{ name }}-latest-{{ pkg_type }}.tar.gz
   url: https://github.com/mapd/mapd-core/archive/v{{ version }}.tar.gz
   sha256: {{ sha256 }}
 
 build:
   number: 0
-  skip: True  # [not linux]
+  skip: True  # [win]
 
 requirements:
   build:
   run:
-    - llvmdev
-    - go
-    - boost
-    - openjdk
-    - gperftools
-    - gdal
-    - arrow-cpp 0.7.1
+    - llvmdev  # [osx]
+    - go  # [osx]
+    - boost  # [osx]
+    - openjdk  # [osx]
+    - gperftools  # [osx]
+    - gdal  # [osx]
+    - arrow-cpp 0.7.1  # [osx]
 
 about:
   home: https://www.mapd.com/

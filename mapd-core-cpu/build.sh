@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 mkdir build
 cd build
@@ -9,7 +9,6 @@ export PKG_CONFIG_PATH=$BUILD_PREFIX/lib/pkgconfig
 
 #export CPPFLAGS="-std=c++14 -I$BUILD_PREFIX/include"
 #export CXXFLAGS="-std=c++14"
-
 #cmake -E env LDFLAGS="-rpath=-L$LD_LIBRARY_PATH" cmake ..
 
 cmake \
