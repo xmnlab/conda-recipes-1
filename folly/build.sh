@@ -18,7 +18,7 @@ export CXXFLAGS="-std=c++14"
 
 ./configure \
    --prefix=$PREFIX \
-   --with-boost=$BUILD_PREFIX \
+   --with-boost=$PREFIX \
    LDFLAGS="-L$BUILD_PREFIX/lib -L$BUILD_PREFIX/lib64" \
    CC=$GCC CXX=$CXX
 
