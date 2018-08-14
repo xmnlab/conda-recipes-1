@@ -36,7 +36,6 @@ requirements:
     - libunwind
     - double-conversion
     - pkg-config
-    - openssl
 
 test:
   requires:

@@ -15,10 +15,19 @@ build:
 
 requirements:
   build:
-    - toolchain
     - autoconf
     - automake
     - libtool
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - gflags
+    - libunwind
+  host:
+    - gflags
+    - libunwind
+  run:
+    - gflags
+    - libunwind
 
 test:
   commands:

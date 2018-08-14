@@ -22,10 +22,14 @@ build:
 
 requirements:
   build:
-    - toolchain
+    # - toolchain
     - cmake
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
     - python  # [win]
     - msinttypes  # [win and py<35]
+    - pthread-stubs  # # [not win]
+    - pthread-win32  # [win]
 
 test:
   requires:
@@ -54,3 +58,4 @@ extra:
     - jakirkham
     - wesm
     - xhochy
+    - xmnlab
