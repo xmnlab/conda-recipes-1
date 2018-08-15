@@ -17,11 +17,13 @@ build:
 
 requirements:
   build:
+    - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - gtest
     - boost-cpp
     - boost
     - cmake
+    - autoconf
     - automake
     - libtool
     - lz4
@@ -36,6 +38,15 @@ requirements:
     - libunwind
     - double-conversion
     - pkg-config
+    - jemalloc
+  host:
+    - gflags
+    - glog
+    - openssl
+  run:
+    - gflags
+    - glog
+    - openssl
 
 test:
   requires:
