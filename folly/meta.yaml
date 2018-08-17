@@ -17,11 +17,7 @@ build:
 
 requirements:
   build:
-    - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - gtest
-    - boost-cpp
-    - boost
     - cmake
     - autoconf
     - automake
@@ -30,23 +26,28 @@ requirements:
     - backports.lzma
     - snappy
     - zlib
-    - glog
-    - gflags
     - scons
+    - pkg-config
+  host:
+    - boost-cpp
+    - boost
+    - double-conversion
+    - gflags
+    - glog
     - openssl
     - libevent
-    - libunwind
-    - double-conversion
-    - pkg-config
     - jemalloc
-  host:
-    - gflags
-    - glog
-    - openssl
+    - libunwind
   run:
+    - boost-cpp
+    - boost
+    - double-conversion
     - gflags
     - glog
     - openssl
+    - libevent
+    - jemalloc
+    - libunwind
 
 test:
   requires:
