@@ -16,21 +16,35 @@ build:
 
 requirements:
   build:
+    - cmake
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+  host:
+    - arrow-cpp 0.7.1
+    - boost-cpp
+    - boost
+    - go
+    - gperftools
     - gdal
-    - libkml
-    - openjdk >=7
+    - openjdk 8
     - maven
     - libarchive  # [osx]
     - libpng
-  run:
-    - llvmdev  # [not osx]
-    - go  # [not osx]
-    - boost  # [not osx]
-    - openjdk
-    - gperftools  # [not osx]
-    - gdal
+    - llvmdev
     - libkml
-    - arrow-cpp 0.7.1  # [not osx]
+  run:
+    - arrow-cpp 0.7.1
+    - boost-cpp
+    - boost
+    - go
+    - gperftools
+    - gdal
+    - openjdk 8
+    - maven
+    - libarchive  # [osx]
+    - libpng
+    - llvmdev
+    - libkml
 
 about:
   home: https://www.mapd.com/

@@ -5,6 +5,12 @@ set -ex
 mkdir -p build
 cd build
 
+if [ $(uname) == Darwin ]; then
+  export CC=clang
+  export CXX=clang++
+  export MACOSX_DEPLOYMENT_TARGET="10.9"
+fi
+
 export LIBGFLAGS_INCLUDE_DIR=$PREFIX/include
 export LD_LIBRARY_PATH=$PREFIX/lib
 export PKG_CONFIG_PATH=$PREFIX/lib/pkgconfig
