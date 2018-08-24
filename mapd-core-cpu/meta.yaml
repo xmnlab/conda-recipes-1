@@ -21,30 +21,42 @@ requirements:
     - {{ compiler('cxx') }}
   host:
     - arrow-cpp 0.7.1
+    - bisonpp
     - boost-cpp
     - boost
+    - folly
     - go
     - gperftools
     - gdal
+    - glog
+    - gflags
     - openjdk 8
     - maven
     - libarchive  # [osx]
     - libpng
     - llvmdev
     - libkml
+    - thrift 0.11.0
+    - thrift-cpp 0.11.0
   run:
     - arrow-cpp 0.7.1
+    - bisonpp
     - boost-cpp
     - boost
+    - folly
     - go
     - gperftools
     - gdal
+    - glog
+    - gflags
     - openjdk 8
     - maven
     - libarchive  # [osx]
     - libpng
     - llvmdev
     - libkml
+    - thrift 0.11.0
+    - thrift-cpp 0.11.0
 
 about:
   home: https://www.mapd.com/

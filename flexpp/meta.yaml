@@ -12,12 +12,17 @@ source:
 
 build:
   number: 0
-  skip: true  # [not linux]
+  skip: true  # [win]
 
 requirements:
   build:
+    - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - make
+  host:
+    - bison
     - bisonpp
+    - m4
 
 test:
   commands:

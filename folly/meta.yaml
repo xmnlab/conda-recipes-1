@@ -30,7 +30,6 @@ requirements:
     - pkg-config
   host:
     - boost-cpp
-    - boost
     - double-conversion
     - gflags
     - glog
@@ -40,7 +39,6 @@ requirements:
     - libunwind
   run:
     - boost-cpp
-    - boost
     - double-conversion
     - gflags
     - glog
