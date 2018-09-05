@@ -8,34 +8,36 @@ package:
 
 source:
   - url: {{ llvm_url }}/llvm-{{ version }}.src.tar.xz
-    fn: llvm.tar.xz
+    folder: llvm-{{ version }}.src
     sha256: b6d6c324f9c71494c0ccaf3dac1f16236d970002b42bb24a6c9e1634f7d0f4e2
   - url: {{ llvm_url }}/cfe-{{ version }}.src.tar.xz
-    fn: cfe.tar.xz
+    folder: llvm-{{ version  }}.src/tools/clang
     sha256: 7c243f1485bddfdfedada3cd402ff4792ea82362ff91fbdac2dae67c6026b667
   - url: {{ llvm_url }}/compiler-rt-{{ version }}.src.tar.xz
-    fn: compiler-rt.tar.xz
+    folder: llvm-{{ version }}.src/projects/compiler-rt
     sha256: f4cd1e15e7d5cb708f9931d4844524e4904867240c306b06a4287b22ac1c99b9
   - url: {{ llvm_url }}/lldb-{{ version }}.src.tar.xz
-    fn: lldb.tar.xz
+    folder: llvm-{{ version }}.src/tools/lldb
     sha256: 6b8573841f2f7b60ffab9715c55dceff4f2a44e5a6d590ac189d20e8e7472714
   - url: {{ llvm_url }}/lld-{{ version }}.src.tar.xz
-    fn: lld.tar.xz
+    folder: llvm-{{ version }}.src/tools/lld
     sha256: e706745806921cea5c45700e13ebe16d834b5e3c0b7ad83bf6da1f28b0634e11
   - url: {{ llvm_url }}/libcxx-{{ version }}.src.tar.xz
-    fn: libcxx.tar.xz
+    folder: llvm-{{ version }}.src/projects/libcxx
     sha256: 7654fbc810a03860e6f01a54c2297a0b9efb04c0b9aa0409251d9bdb3726fc67
   - url: {{ llvm_url }}/libcxxabi-{{ version }}.src.tar.xz
-    fn: libcxxabi.tar.xz
+    folder: llvm-{{ version }}.src/projects/libcxxabi
     sha256: 209f2ec244a8945c891f722e9eda7c54a5a7048401abd62c62199f3064db385f
 
 build:
   number: 0
   skip: true  # [win]
 
-# requirements:
-#   build:
-#    - gcc
+requirements:
+  build:
+   - cmake
+  host:
+   - python
 
 test:
   requires:
