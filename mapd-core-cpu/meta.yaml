@@ -17,6 +17,8 @@ build:
 requirements:
   build:
     - cmake
+    - {{ compiler('c') }} 4
+    - {{ compiler('cxx') }} 4
     - clangdev 4.0.0
     - llvmdev 4.0.0
     - git
