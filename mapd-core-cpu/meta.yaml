@@ -1,6 +1,6 @@
 {% set name = "mapd-core-cpu" %}
-{% set version = "4.0.1" %}
-{% set sha256 = "4e49bf3a9453188b4aec4f8f1318f1ffb381412cf6e85488b07bdaab6808cc1f" %}
+{% set version = "4.1.1" %}
+{% set sha256 = "b8967cd5e8e08ee33f405b3247f66fa9498fbdd053d2a424c6b40d4bc065ab96" %}
 
 package:
   name: {{ name|lower }}
@@ -17,36 +17,33 @@ build:
 requirements:
   build:
     - cmake
-    - {{ compiler('c') }} 4
-    - {{ compiler('cxx') }} 4
-    - clangdev 4.0.0
-    - llvmdev 4.0.0
+    - clangdev=6
+    - llvmdev=6
     - git
-  host:
-    - arrow-cpp 0.7.1
+    - go
+    - openjdk=8
+    - maven
+    - arrow-cpp=0.7.1
     - bisonpp
-    - boost-cpp 1.65.0
+    - boost-cpp=1.67
     - double-conversion
     - flex
     - folly
-    - go
     - gperftools
     - gdal
     - glog
     - gflags
-    - openjdk 8
     - openssl
-    - maven
     - libarchive  # [osx]
     - libpng
-    - llvmdev
     - libkml
-    - thrift-cpp 0.11.0
-    - thrift 0.11.0
+    - thrift-cpp=0.11.0
+    - thrift=0.11.0
+    - wget
   run:
-    - arrow-cpp 0.7.1
+    - arrow-cpp=0.7.1
     - bisonpp
-    - boost-cpp
+    - boost-cpp=1.67
     - double-conversion
     - flex
     - folly
@@ -55,14 +52,14 @@ requirements:
     - gdal
     - glog
     - gflags
-    - openjdk 8
+    - openjdk=8
     - openssl
     - maven
     - libarchive  # [osx]
     - libpng
-    - llvmdev
+    - llvmdev=6
     - libkml
-    - thrift-cpp 0.11.0
+    - thrift-cpp=0.11.0
 
 about:
   home: https://www.mapd.com/
@@ -81,3 +78,4 @@ extra:
   recipe-maintainers:
     - xmnlab
     - pearu
+    - andrewseidl

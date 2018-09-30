@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./mapd_server -v
+mapdql -v
